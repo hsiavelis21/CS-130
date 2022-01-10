@@ -29,6 +29,6 @@ jobs:
               
     - name: Run tests
       run: |
-        pytest tests/test1.py --exitfirst --verbose --failed-first \
+        pytest tests/test1.py --exitfirst --verbose --failed-first 
         coverage run -m pytest tests/test1.py
  
