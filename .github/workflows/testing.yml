@@ -1,0 +1,30 @@
+name: CI Tests
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: 
+      - main 
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  CI-Tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with: 
+        python-version: 3.8 
+        
+    - name: Install pipenv and dependencies
+      run: |
+        pip install pipenv
+        pipenv install --ignore-pipfile
+      
+    - name: Run tests
+      run: pipenv run make test
