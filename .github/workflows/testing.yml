@@ -28,10 +28,13 @@ jobs:
         pip install coverage
         pip install mypy
         pip install lark
+        pip install sphinx
               
     - name: Run tests
       run: |
         pytest tests/test1.py --exitfirst --verbose --failed-first 
         coverage run -m pytest tests/test1.py
         mypy tests/test1.py
+        
+        sphinx-quickstart
  
