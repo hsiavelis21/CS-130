@@ -27,6 +27,7 @@ jobs:
         pip3 install -r .github/workflows/requirements.txt
         pip install coverage
         pip install mypy
+        pip install lark
               
     - name: Run tests
       run: |
