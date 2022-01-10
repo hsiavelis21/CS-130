@@ -29,4 +29,4 @@ jobs:
     - name: Run tests
       run: |
         pytest --exitfirst --verbose --failed-first \
-        --cov=. --cov-report html 
+ 
