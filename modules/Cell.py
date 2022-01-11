@@ -1,4 +1,4 @@
-import CellContentsClass
+import CellContents
 
 class Cell:
     

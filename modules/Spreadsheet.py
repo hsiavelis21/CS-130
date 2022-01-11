@@ -1,6 +1,6 @@
-import CellClass
+import Cell
 
-class SpreadsheetClass:
+class Spreadsheet:
 
     MAX_CELL = 'ZZZ9999'
 

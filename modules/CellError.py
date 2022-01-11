@@ -1,4 +1,4 @@
-from CellErrorTypeClass import CellErrorType 
+import CellErrorType 
 from typing import *
 
 class CellError:
