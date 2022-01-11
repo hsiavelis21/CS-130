@@ -1,5 +1,7 @@
 from typing import *
-import CellErrorClass
+import CellError
+from modules.Spreadsheet import Spreadsheet
+
 
 #==============================================================================
 # Caltech CS130 - Winter 2022
@@ -43,6 +45,31 @@ class Workbook:
         # workbook's internal state.
         return self.spreadsheet_list
 
+
+    #helper function that checks if the sheet name is already taken
+    def check_valid_name(self, sheet_name):
+        for i in range(self.num_sheets()):
+            #Todo: quotation marks are excluded, no starting or ending with whitespace,
+            #and cannot be the empty string
+            #if name is empty string, raise value error 
+            if sheet_name == '':
+               return False 
+            if self.spreadsheet_list[i].name.lower() == sheet_name.lower():
+                return False  
+        return True
+
+    #generates a spreadsheet name that is valid
+    def generate_spreadsheet_name(self):
+        curr_number = self.num_sheets
+        new_name = "Sheet" + str(curr_number)
+
+        while not self.check_valid_name(new_name):
+            curr_number += 1
+            new_name = "Sheet" + str(curr_number)
+
+        return new_name
+
+
     def new_sheet(self, sheet_name: Optional[str] = None) -> Tuple[int, str]:
         # Add a new sheet to the workbook.  If the sheet name is specified, it
         # must be unique.  If the sheet name is None, a unique sheet name is
@@ -56,14 +83,19 @@ class Workbook:
         # If the spreadsheet name is an empty string (not None), or it is
         # otherwise invalid, a ValueError is raised.
 
+        #checks if 
+        if not self.check_valid_name(sheet_name):
+            raise ValueError("Invalid Spreadsheet Name")
+       
         #create a new spreadsheet object
-        #check that name is unique, else error
         #if name is None, generate name ***create a new function for name
-        #if name is empty string, raise value error 
-        # return the index of the sheet and its name(case sensitive)
+        if sheet_name == None:
+            sheet_name = self.generate_spreadsheet_name(self.num_sheets)
 
-        
-        pass
+        curr_sheet = Spreadsheet(sheet_name)
+        self.spreadsheet_list.append(curr_sheet)
+
+        return (self.num_sheets - 1, sheet_name)
 
     def del_sheet(self, sheet_name: str) -> None:
         # Delete the spreadsheet with the specified name.
@@ -72,7 +104,12 @@ class Workbook:
         # case does not have to.
         #
         # If the specified sheet name is not found, a KeyError is raised.
-        pass
+
+        for i in range(self.num_sheets):
+            curr_sheet = self.spreadsheet_list[i]
+            if curr_sheet.name.lower() == sheet_name.lower():
+                self.spreadsheet_list.pop(i)
+        raise KeyError("Specified sheet name is not found.")
 
     def get_sheet_extent(self, sheet_name: str) -> Tuple[int, int]:
         # Return a tuple (num-cols, num-rows) indicating the current extent of
@@ -82,7 +119,12 @@ class Workbook:
         # case does not have to.
         #
         # If the specified sheet name is not found, a KeyError is raised.
-        pass
+
+        for i in range(self.num_sheets):
+            curr_sheet = self.spreadsheet_list[i]
+            if curr_sheet.name.lower() == sheet_name.lower():
+                return curr_sheet.get_extent()
+        raise KeyError("Specified sheet name is not found.") 
 
     def set_cell_contents(self, sheet_name: str, location: str,
                           contents: Optional[str]) -> None:
@@ -106,7 +148,19 @@ class Workbook:
         # invalid for some reason, this method does not raise an exception;
         # rather, the cell's value will be a CellError object indicating the
         # naure of the issue.
-        pass
+
+        #iterate through sheets
+        for i in range(self.num_sheets):
+            curr_sheet = self.spreadsheet_list[i]
+            if curr_sheet.name.lower() == sheet_name.lower():
+                #get the cell and change contents
+                curr_sheet.set_spreadsheet_cell_contents(location, contents)
+                return
+        
+        raise KeyError("Specified sheet name is not found.")
+
+
+        
 
     def get_cell_contents(self, sheet_name: str, location: str) -> Optional[str]:
         # Return the contents of the specified cell on the specified sheet.
@@ -116,7 +170,6 @@ class Workbook:
         # specified in any case.
         #
         # If the specified sheet name is not found, a KeyError is raised.
-        # If the cell location is invalid, a ValueError is raised.
         #
         # Any string returned by this function will not have leading or trailing
         # whitespace, as this whitespace will have been stripped off by the
@@ -124,7 +177,14 @@ class Workbook:
         #
         # This method will never return a zero-length string; instead, empty
         # cells are indicated by a value of None.
-        pass
+        for i in range(self.num_sheets):
+            curr_sheet = self.spreadsheet_list[i]
+            if curr_sheet.name.lower() == sheet_name.lower():
+                #get the cell and change contents
+                curr_sheet.get_spreadsheet_cell_contents(location)
+                return
+        
+        raise KeyError("Specified sheet name is not found.")
 
     def get_cell_value(self, sheet_name: str, location: str) -> Any:
         # Return the evaluated value of the specified cell on the specified
