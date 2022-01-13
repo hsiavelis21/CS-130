@@ -2,16 +2,16 @@ class CellContents:
 
     def __init__(self, contents=''):
 
-        self.contents = contents
-        self.type = self.find_type(contents)
-        self.value = self.set_value(self.type, contents)
+        self.contents = self.filter_contents(contents)
+        #self.type = self.find_type(contents)
+        #self.value = self.set_value(self.type, contents)
         self.references = []
 
     def get_contents(self):
         return self.contents
 
     def set_contents(self, new_content):
-        self.contents = new_content
+        self.contents = self.filter_contents(new_content)
         self.type = self.find_type(new_content)
         self.value = self.set_value(self.type, new_content)
         #incorporate references here 
@@ -19,7 +19,12 @@ class CellContents:
 
     # remove white space, update contents
     def filter_contents(self, contents):
-        pass
+        return contents.strip()
+
+    #remove whitespaces
+    #update cell contents to have no white space
+
+    
 
     # input: contents of cell (string input)
     # output: the type of the contents;
