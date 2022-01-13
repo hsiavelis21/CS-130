@@ -1,5 +1,4 @@
 import modules.CellContents
-from pytest import ExitCode
 
 def test_filter_contents():
     test_string1 = ''
