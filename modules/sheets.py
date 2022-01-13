@@ -204,4 +204,13 @@ class Workbook:
         # decimal place, and will not include a decimal place if the value is a
         # whole number.  For example, this function would not return
         # Decimal('1.000'); rather it would return Decimal('1').
-        pass
+        for i in range(self.num_sheets):
+            curr_sheet = self.spreadsheet_list[i]
+            if curr_sheet.name.lower() == sheet_name.lower():
+                #get the cell and change contents
+                curr_sheet.get_spreadsheet_cell_value(location)
+                return
+        
+        raise KeyError("Specified sheet name is not found.")
+
+

@@ -1,6 +1,6 @@
 import enum
 
-class CellContentsClass(enum.Enum):
+class CellContents(enum.Enum):
 
     '''
     This enum specifies the types of content a cell can hold.

@@ -51,15 +51,19 @@ class Spreadsheet:
     #gets an existing celll
     def get_spreadsheet_cell_contents(self, location):
         row, col = location
-        curr_cell = self.matrix[row][col]
 
         #make sure the location is valid
         if not self.matrix[row][col].check_valid_cell_locations(location):
             raise ValueError("Not a valid cell location.")
         return self.matrix[row][col].get_cell_contents()
 
+    def get_spreadsheet_cell_value(self, location):
 
+        row, col = location
 
+        if not self.matrix[row][col].check_valid_cell_locations(location):
+            raise ValueError("Not a valid cell location.")
+        return self.matrix[row][col].get_cell_value()
 
         
 
