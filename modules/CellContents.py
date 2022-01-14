@@ -1,3 +1,4 @@
+from decimal import *
 class CellContents:
 
     def __init__(self, contents=''):
@@ -19,20 +20,43 @@ class CellContents:
 
     # remove white space, update contents
     def filter_contents(self, contents):
-        return contents.strip()
+        new_contents = contents.strip()
+        if new_contents == '':
+            return None
+        else:
+            return new_contents
 
     #remove whitespaces
     #update cell contents to have no white space
 
     
 
-    # input: contents of cell (string input)
+    # input: filtered contents of cell (string input)
     # output: the type of the contents;
     # possible types: formula, string, literal value, empty cell (none type)
-    # look at CellContentsTypeClass.py
     def find_type(contents):
-        pass
+        
+        if contents == '':
+            return 'EMPTY'
 
+        if contents[0] == "'":
+            return 'STRING'
+
+        if contents[0] == '=':
+            return 'FORMULA'
+
+        else:
+            for char in contents:
+                dot_count = 0
+                if char == '.':
+                    dot_count += 1
+
+                if dot_count > 1 or (char != '.' and not char.isnumeric()):
+                    return 'STRING'
+            
+            return 'LITERAL'
+
+    #Todo: NEEDS T0 BE CHANGED TO ADDRESS INVALID TYPE CHANGES
     def set_type(self, new_type):
         self.type = new_type #if None, means empty cell
 
@@ -47,16 +71,37 @@ class CellContents:
         # invalid for some reason, this method does not raise an exception;
         # rather, the cell's value will be a CellError object indicating the
         # naure of the issue.
-    def set_value(self, type, contents):
+    def set_value(self, contents_type, contents):
         # self.value = ???
 
-        pass
+        if contents_type == 'EMPTY':
+            self.value = None
+
+        if contents_type == 'STRING': #Get rid of quotation
+            if contents[0] == "'":
+                self.value = contents[1:]
+            else:
+                self.value = contents
+
+        if contents_type == 'FORMULA':
+            break
+
+        if contents_type == 'LITERAL':
+            # REMOVE ALL TRAILING ZEROS FROM CONTENTS
+            if '.' in contents:
+                for i in range(len(contents)-1, -1, -1):
+                    if contents[i] == '0':
+                        contents = contents[:i]
+                    else:
+                        break
+            self.value = Decimal(contents)
+
 
     def get_value(self): #parse for cell references
         return self.value
-
+        
     def is_empty(self):
-        return self.contents == ''
+        return self.contents == None
 
      #adds cells that the current cell references
     def add_reference(self, ref):

@@ -1,3 +1,4 @@
 [
-  "test_CellContents.py::test_filter_contents"
+  "test_CellContents.py::test_filter_contents",
+  "test_CellContents.py::test_get_contents"
 ]

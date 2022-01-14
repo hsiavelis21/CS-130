@@ -12,7 +12,8 @@ class Cell:
     #check to make sure not greater than 9999 or less than 1 
     def check_valid_cell_locations(self, location):
         pass
-    # given location in string format [col][row], return separate column and row strings
+
+    # given location in string format [col][row], return separate column and row strings ex) A15, B12
     def find_location(location): 
         pass #test parsing
 
