@@ -4,7 +4,7 @@ class Cell:
     
     # location is in format [col][row]; i.e. BR453
     def __init__(self, location, cell_contents=''):
-        row, col = self.find_location(location) # To access cell in matrix, subtract 1 from the row and column values
+        col, row = self.find_location(location) # To access cell in matrix, subtract 1 from the row and column values
         self.row = row
         self.col = col
         self.cell_contents = cell_contents
@@ -15,10 +15,22 @@ class Cell:
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
     # OUR MATRIX IS 0-INDEXED WHILE THE SPREADSHEET ITSELF IS ONE INDEXED; FIND LOCATION WILL GIVE 1-INDEXED VALUES
-    def find_location(location): 
-        pass
+    def find_location(self, location):
+        row = ''
+        col = ''
+        for i in range(len(location)):
+            if location[i].isnumeric(): # if character is a letter, it belongs to 
+                row += location[i]
+            else:
+                col += location[i]
 
-    def cast_column_to_number(col):
+        col = self.cast_column_to_number(col)
+        row = int(row)
+
+        return(col, row)
+
+
+    def cast_column_to_number(self, col):
     #col is a string of letters
         num = 0
         size = len(col) - 1
@@ -27,8 +39,11 @@ class Cell:
         return num
         
     # DIFFERENT FROM FIND_INDICES; given cell object, return cell's row and col index
-    def get_indices(self):
-        return self.row, self.col
+    def get_row(self):
+        return self.row
+
+    def get_col(self):
+        return self.col
 
     # Return contents object of cell
     def get_cell_contents(self):

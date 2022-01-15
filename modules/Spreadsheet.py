@@ -14,7 +14,7 @@ class Spreadsheet:
         self.matrix = [[]]
         for r in range(self.MAX_ROW):
             for c in range(self.MAX_COL):
-                self.matrix[r][c] = Cell(r,c)
+                self.matrix[r][c] = Cell(r,c) #ERROR: R, C HAS TO BE STRING
         self.extent = (0, 0)
         self.name = label
 

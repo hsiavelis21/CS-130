@@ -84,7 +84,8 @@ class CellContents:
                 self.value = contents
 
         if contents_type == 'FORMULA':
-            break
+            print('FORMULA NOT SUPPORTED CURRENTLY')
+            
 
         if contents_type == 'LITERAL':
             # REMOVE ALL TRAILING ZEROS FROM CONTENTS
