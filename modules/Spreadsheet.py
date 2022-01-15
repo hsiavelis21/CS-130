@@ -35,19 +35,63 @@ class Spreadsheet:
         row, col = location
         curr_cell = self.matrix[row][col]
 
-        if curr_cell.is_empty():
-             # if empty, create new cell and add properties
-            new_cell = Cell(row, col, new_contents)
-            curr_row_extent = self.extent[0]
-            curr_col_extent = self.extent[1]
+        new_cell = Cell(row, col, new_contents)
+        curr_row_extent = self.extent[0]
+        curr_col_extent = self.extent[1]
+
+        # If a new non-empty value is being put into an empty cell
+        if curr_cell.is_empty() and not new_cell.is_empty():
+             # if empty, create new cell and add properties; update extent if necessary
             self.set_extent(max(curr_row_extent, row), max(curr_col_extent, col))
-        else:
-    # if not empty, set cell properties to new properties and check if other cells reference 
-    #referencing is done in abstraction layers
-            curr_cell.set_cell_contents(new_contents)
-            curr_cell.set_cell_value(new_contents)
+
+        elif not curr_cell.is_empty() and new_cell.is_empty():
+            new_row_extent, new_col_extent = self.get_new_extent(row, col)
+            self.set_extent(new_row_extent, new_col_extent)
+
+        # if not empty, set cell properties to new properties and check if other cells reference 
+        #referencing is done in abstraction layers
+        curr_cell.set_cell_contents(new_contents)
+        curr_cell.set_cell_value(new_contents)
             #other cells referencing this cell
-    
+
+    # If the cell at [row, col] no longer exists, return the new extent of the spreadsheet. If row, col
+    # is less than the current extent, return the current extent
+    def get_new_extent(row, col):
+        curr_row_extent, curr_col_extent = self.extent
+        max_row_extent = max(row, curr_row_extent)
+        max_col_extent = max(col, curr_col_extent)
+
+        final_row_extent = 0
+        final_col_extent = 0
+
+        if row < curr_row_extent and col < curr_col_extent:
+            return self.extent
+        else:
+            if row >= curr_row_extent:
+                if curr_row_extent <= 1:
+                    final_row_extent = 0
+
+                for c in range(max_col_extent - 1, -1, -1):
+                    for r in range(max_row_extent - 1, -1, -1):
+                        if not self.matrix[r][c].is_empty():
+                            final_row_extent = max(final_row_extent, r)
+            
+            if col >= curr_col_extent:
+                if curr_row_extent <= 1:
+                    final_col_extent = 0
+
+                for r in range(max_row_extent-1, -1, -1):
+                    for c in range(max_col_extent-1, -1, -1):
+                        if not self.matrix[r][c].is_empty():
+                            final_col_extent = max(final_col_extent, c)
+
+        return final_row_extent, final_col_extent
+
+        # row, col represents a cell that doees not change the extent
+        if max_row_extent == curr_row_extent and max_col_extent == curr_col_extent:
+            return (max_row_extent, max_col_extent)
+
+
     #gets an existing celll
     def get_spreadsheet_cell_contents(self, location):
         row, col = location
