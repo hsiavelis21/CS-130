@@ -30,6 +30,18 @@ class Spreadsheet:
     def set_extent(self, new_extent):
         self.extent = new_extent
 
+
+    def number_to_col(num):
+        col = ""
+        A = ord('A')
+        while True:
+            if num > 26:
+                num, remainder = divmod(num - 1, 26)
+                col += chr(remainder + A)
+            else:
+                return chr(num + A - 1) + col
+
+                
     #edits an EXISTING STATEMENTS or adds a NEW cell
     def set_spreadsheet_cell_contents(self, location, new_contents):
         row, col = location
