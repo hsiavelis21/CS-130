@@ -18,6 +18,14 @@ class Cell:
     def find_location(location): 
         pass
 
+    def cast_column_to_number(col):
+    #col is a string of letters
+        num = 0
+        size = len(col) - 1
+        for index in range(len(col)):
+            num += (26 ** (index)) * (ord(col[size - index]) - 64)
+        return num
+        
     # DIFFERENT FROM FIND_INDICES; given cell object, return cell's row and col index
     def get_indices(self):
         return self.row, self.col

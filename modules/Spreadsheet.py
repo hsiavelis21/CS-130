@@ -56,7 +56,7 @@ class Spreadsheet:
 
     # If the cell at [row, col] no longer exists, return the new extent of the spreadsheet. If row, col
     # is less than the current extent, return the current extent
-    def get_new_extent(row, col):
+    def get_new_extent(self, row, col):
         curr_row_extent, curr_col_extent = self.extent
         max_row_extent = max(row, curr_row_extent)
         max_col_extent = max(col, curr_col_extent)
