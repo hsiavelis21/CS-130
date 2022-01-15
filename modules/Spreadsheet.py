@@ -1,20 +1,20 @@
-import Cell
+from Cell import Cell
 
 class Spreadsheet:
 
     MAX_CELL = 'ZZZZ9999'
-    MAX_ROW = 9999
-    MAX_COL = 9999
+    MAX_ROW = 10 #9999
+    MAX_COL = 10 #475254
 
 
     # Empty sheet constructor
     # Properties of a spreadsheet: matrix of cells
     def __init__(self, label = ""):
         # instead of starting it with empty matrix, maybe initialize it to be ZZZZ x 9999 matrix with all empty cells
-        self.matrix = [[]]
+        self.matrix = [[None]*self.MAX_COL]*self.MAX_ROW
         for r in range(self.MAX_ROW):
             for c in range(self.MAX_COL):
-                self.matrix[r][c] = Cell(r,c) #ERROR: R, C HAS TO BE STRING
+                self.matrix[r][c] = Cell(self.convert_indices_to_location(r, c))
         self.extent = (0, 0)
         self.name = label
 
@@ -30,8 +30,28 @@ class Spreadsheet:
     def set_extent(self, new_extent):
         self.extent = new_extent
 
+    # Given a row and column index (1-indexed), return the corresponding spreadsheet string location
+    # Note, inputs r and c are zero indexed. Location must be 1 indexed.
+    def convert_indices_to_location(self, r, c):
+        # Convert 0-indexed indices to 1-index
+        c += 1
+        r += 1
 
-    def number_to_col(num):
+        col = ""
+        A = ord('A')
+        while True:
+            if c > 26:
+                c, remainder = divmod(c - 1, 26)
+                col += chr(remainder + A)
+            else:
+                col = chr(c + A - 1) + col
+                break
+
+        # Spreadsheet location format is [col][row]
+        return col + str(r)
+
+    # Given a number (e.g. 2), return the string associated with the column's name (in this case, B)
+    def number_to_col_name(self, num):
         col = ""
         A = ord('A')
         while True:
