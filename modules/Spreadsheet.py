@@ -50,7 +50,7 @@ class Spreadsheet:
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
     # WILL GIVE 1-INDEXED VALUES
-    '''def convert_location_to_indices(self, location):
+    def convert_location_to_indices(self, location):
         row = ''
         col = ''
         for i in range(len(location)):
@@ -70,17 +70,18 @@ class Spreadsheet:
         size = len(col) - 1
         for index in range(len(col)):
             num += (26 ** (index)) * (ord(col[size - index]) - 64)
-        return num'''
+        return num
 
     #edits an EXISTING STATEMENTS or adds a NEW cell
     def set_spreadsheet_cell_contents(self, location, new_contents):
 
         # Convert location to indices on spreadsheet
-        row, col = Cell.convert_location_to_indices(location)
+        row, col = self.convert_location_to_indices(location)
 
         # Check if location is a valid location on the spreadsheet
         if row < 1 or row > 9999 or col < 1 or col > 475254:
-            raise ValueError('Cell location is invalid.')
+            #raise ValueError('Cell location is invalid.')
+            return "ValueError"
 
         new_cell = Cell(location, new_contents)
 
@@ -89,7 +90,7 @@ class Spreadsheet:
             curr_cell = self.dict[location]
 
             # CASE 1.1: New cell has empty contents
-            if new_cell.get_type() == 'EMPTY'
+            if new_cell.get_type() == 'EMPTY':
             # Change extent and remove the cell out of the dictionary
                 del self.dict[location]
                 self.extent = self.get_new_extent(location)
@@ -104,7 +105,7 @@ class Spreadsheet:
 
                 self.dict[location] = new_cell
 
-                new_row, new_col = Cell.convert_location_to_indices(location)
+                new_row, new_col = self.convert_location_to_indices(location)
 
                 self.extent[0] = max(self.extent[0], new_col)
                 self.extent[1] = max(self.extent[1], new_row)
@@ -114,7 +115,7 @@ class Spreadsheet:
     # is less than the current extent, return the current extent
     def get_new_extent(self, location):
 
-        row, col = Cell.convert_location_to_indices(location)
+        row, col = self.convert_location_to_indices(location)
 
         if row < self.extent[1] and col < self.extent[0]:
             return self.extent
@@ -124,7 +125,7 @@ class Spreadsheet:
             max_col = col
 
             for cell in self.dict:
-                curr_row, curr_col = Cell.convert_location_to_indices(cell)
+                curr_row, curr_col = self.convert_location_to_indices(cell)
                 max_row = max(max_row, curr_row)
                 max_col = max(max_col, curr_col)
 

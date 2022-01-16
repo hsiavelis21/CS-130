@@ -4,7 +4,7 @@ class Cell:
     
     # location is in format [col][row]; i.e. BR453
     def __init__(self, location, cell_contents=''):
-        row, col = self.convert_location_to_indices(location) # To access cell in matrix, subtract 1 from the row and column values
+        row, col = self.convert_location_to_indices(location).upper() # To access cell in matrix, subtract 1 from the row and column values
         self.row = row
         self.col = col
         self.cell_contents = cell_contents
