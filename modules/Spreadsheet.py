@@ -30,7 +30,7 @@ class Spreadsheet:
     def set_extent(self, new_extent):
         self.extent = new_extent
 
-    # Given a row and column index (1-indexed), return the corresponding spreadsheet string location
+    # Given a row and column index (input is 0-indexed), return the corresponding spreadsheet string location
     # Note, inputs r and c are zero indexed. Location must be 1 indexed.
     def convert_indices_to_location(self, r, c):
         # Convert 0-indexed indices to 1-index
@@ -49,25 +49,14 @@ class Spreadsheet:
 
         # Spreadsheet location format is [col][row]
         return col + str(r)
-
-    # Given a number (e.g. 2), return the string associated with the column's name (in this case, B)
-    def number_to_col_name(self, num):
-        col = ""
-        A = ord('A')
-        while True:
-            if num > 26:
-                num, remainder = divmod(num - 1, 26)
-                col += chr(remainder + A)
-            else:
-                return chr(num + A - 1) + col
-
                 
+
     #edits an EXISTING STATEMENTS or adds a NEW cell
     def set_spreadsheet_cell_contents(self, location, new_contents):
         row, col = location
-        curr_cell = self.matrix[row][col]
+        curr_cell = self.matrix[row][col] # ERROR- LOCATION IS STRING, NOT TUPLE
 
-        new_cell = Cell(row, col, new_contents)
+        new_cell = Cell(self.convert_indices_to_location(row, col), new_contents)
         curr_row_extent = self.extent[0]
         curr_col_extent = self.extent[1]
 

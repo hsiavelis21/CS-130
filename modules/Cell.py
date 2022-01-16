@@ -4,7 +4,7 @@ class Cell:
     
     # location is in format [col][row]; i.e. BR453
     def __init__(self, location, cell_contents=''):
-        col, row = self.find_location(location) # To access cell in matrix, subtract 1 from the row and column values
+        row, col = self.find_location(location) # To access cell in matrix, subtract 1 from the row and column values
         self.row = row
         self.col = col
         self.cell_contents = cell_contents
@@ -27,7 +27,7 @@ class Cell:
         col = self.cast_column_to_number(col)
         row = int(row)
 
-        return(col, row)
+        return(row, col)
 
 
     def cast_column_to_number(self, col):
