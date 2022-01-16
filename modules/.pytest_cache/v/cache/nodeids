@@ -1,3 +1,6 @@
 [
-  "test_CellContents.py::test_filter_contents"
+  "test_Cell.py::test_find_location",
+  "test_CellContents.py::test_filter_contents",
+  "test_CellContents.py::test_get_contents",
+  "test_Spreadsheet.py::test_spreadsheet"
 ]
