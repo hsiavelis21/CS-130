@@ -9,14 +9,13 @@ class Spreadsheet:
 
     # Empty sheet constructor
     # Properties of a spreadsheet: matrix of cells
-    def __init__(self, label = ""):
-        # instead of starting it with empty matrix, maybe initialize it to be ZZZZ x 9999 matrix with all empty cells
-        self.matrix = [[None]*self.MAX_COL]*self.MAX_ROW
-        for r in range(self.MAX_ROW):
-            for c in range(self.MAX_COL):
-                self.matrix[r][c] = Cell(self.convert_indices_to_location(r, c))
+    def __init__(self, name = ""):
+        self.name = name
+
+        # Extent is formatted as ([col], [row])
         self.extent = (0, 0)
-        self.name = label
+
+        self.dict = {}
 
     def get_name(self):
         return self.name
@@ -30,12 +29,10 @@ class Spreadsheet:
     def set_extent(self, new_extent):
         self.extent = new_extent
 
-    # Given a row and column index (input is 0-indexed), return the corresponding spreadsheet string location
-    # Note, inputs r and c are zero indexed. Location must be 1 indexed.
+    # Given a row and column index (input is 1-indexed), return the corresponding spreadsheet string location
+    # Location must be 1 indexed.
     def convert_indices_to_location(self, r, c):
         # Convert 0-indexed indices to 1-index
-        c += 1
-        r += 1
 
         col = ""
         A = ord('A')
@@ -51,84 +48,102 @@ class Spreadsheet:
         return col + str(r)
                 
 
+    # given location in string format [col][row], return separate column and row strings ex) A15, B12
+    # WILL GIVE 1-INDEXED VALUES
+    '''def convert_location_to_indices(self, location):
+        row = ''
+        col = ''
+        for i in range(len(location)):
+            if location[i].isnumeric(): # if character is a letter, it belongs to 
+                row += location[i]
+            else:
+                col += location[i]
+
+        col = self.cast_column_to_number(col)
+        row = int(row)
+
+        return(row, col)
+
+    def cast_column_to_number(self, col):
+    #col is a string of letters
+        num = 0
+        size = len(col) - 1
+        for index in range(len(col)):
+            num += (26 ** (index)) * (ord(col[size - index]) - 64)
+        return num'''
+
     #edits an EXISTING STATEMENTS or adds a NEW cell
     def set_spreadsheet_cell_contents(self, location, new_contents):
-        row, col = location
-        curr_cell = self.matrix[row][col] # ERROR- LOCATION IS STRING, NOT TUPLE
 
-        new_cell = Cell(self.convert_indices_to_location(row, col), new_contents)
-        curr_row_extent = self.extent[0]
-        curr_col_extent = self.extent[1]
+        # Convert location to indices on spreadsheet
+        row, col = Cell.convert_location_to_indices(location)
 
-        # If a new non-empty value is being put into an empty cell
-        if curr_cell.is_empty() and not new_cell.is_empty():
-             # if empty, create new cell and add properties; update extent if necessary
-            self.set_extent(max(curr_row_extent, row), max(curr_col_extent, col))
+        # Check if location is a valid location on the spreadsheet
+        if row < 1 or row > 9999 or col < 1 or col > 475254:
+            raise ValueError('Cell location is invalid.')
 
-        elif not curr_cell.is_empty() and new_cell.is_empty():
-            new_row_extent, new_col_extent = self.get_new_extent(row, col)
-            self.set_extent(new_row_extent, new_col_extent)
+        new_cell = Cell(location, new_contents)
 
-        # if not empty, set cell properties to new properties and check if other cells reference 
-        #referencing is done in abstraction layers
-        curr_cell.set_cell_contents(new_contents)
-        curr_cell.set_cell_value(new_contents)
-            #other cells referencing this cell
+        # Case 1: Cell at specified location has non-empty contents 
+        if location in self.dict.keys():
+            curr_cell = self.dict[location]
 
-    # If the cell at [row, col] no longer exists, return the new extent of the spreadsheet. If row, col
-    # is less than the current extent, return the current extent
-    def get_new_extent(self, row, col):
-        curr_row_extent, curr_col_extent = self.extent
-        max_row_extent = max(row, curr_row_extent)
-        max_col_extent = max(col, curr_col_extent)
+            # CASE 1.1: New cell has empty contents
+            if new_cell.get_type() == 'EMPTY'
+            # Change extent and remove the cell out of the dictionary
+                del self.dict[location]
+                self.extent = self.get_new_extent(location)
 
-        final_row_extent = 0
-        final_col_extent = 0
-
-        if row < curr_row_extent and col < curr_col_extent:
-            return self.extent
+            else:
+                curr_cell.set_cell_contents(new_contents) # Note, referencing is done in abstraction layers
+                curr_cell.set_cell_value(new_contents)
+       
         else:
-            if row >= curr_row_extent:
-                if curr_row_extent <= 1:
-                    final_row_extent = 0
+        # CASE 2: Cell at specified location has empty contents
+            if new_cell.get_type() != 'EMPTY':
 
-                for c in range(max_col_extent - 1, -1, -1):
-                    for r in range(max_row_extent - 1, -1, -1):
-                        if not self.matrix[r][c].is_empty():
-                            final_row_extent = max(final_row_extent, r)
-            
-            if col >= curr_col_extent:
-                if curr_row_extent <= 1:
-                    final_col_extent = 0
+                self.dict[location] = new_cell
 
-                for r in range(max_row_extent-1, -1, -1):
-                    for c in range(max_col_extent-1, -1, -1):
-                        if not self.matrix[r][c].is_empty():
-                            final_col_extent = max(final_col_extent, c)
+                new_row, new_col = Cell.convert_location_to_indices(location)
 
-        return final_row_extent, final_col_extent
+                self.extent[0] = max(self.extent[0], new_col)
+                self.extent[1] = max(self.extent[1], new_row)
 
-        # row, col represents a cell that doees not change the extent
-        if max_row_extent == curr_row_extent and max_col_extent == curr_col_extent:
-            return (max_row_extent, max_col_extent)
+    
+    # If the cell at [row, col] does not exist, return the new extent of the spreadsheet. If row, col
+    # is less than the current extent, return the current extent
+    def get_new_extent(self, location):
+
+        row, col = Cell.convert_location_to_indices(location)
+
+        if row < self.extent[1] and col < self.extent[0]:
+            return self.extent
+
+        else:
+            max_row = row
+            max_col = col
+
+            for cell in self.dict:
+                curr_row, curr_col = Cell.convert_location_to_indices(cell)
+                max_row = max(max_row, curr_row)
+                max_col = max(max_col, curr_col)
+
+        return max_row, max_col
 
 
     #gets an existing celll
     def get_spreadsheet_cell_contents(self, location):
-        row, col = location
-
-        #make sure the location is valid
-        if not self.matrix[row][col].check_valid_cell_locations(location):
+        if not location not in self.dict.keys():
             raise ValueError("Not a valid cell location.")
-        return self.matrix[row][col].get_cell_contents()
+
+        return self.dict[location].get_cell_contents()
 
     def get_spreadsheet_cell_value(self, location):
 
-        row, col = location
-
-        if not self.matrix[row][col].check_valid_cell_locations(location):
+        if not location not in self.dict.keys():
             raise ValueError("Not a valid cell location.")
-        return self.matrix[row][col].get_cell_value()
+
+        return self.dict[location].get_cell_value()
 
         
 

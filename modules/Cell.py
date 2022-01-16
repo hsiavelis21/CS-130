@@ -4,18 +4,15 @@ class Cell:
     
     # location is in format [col][row]; i.e. BR453
     def __init__(self, location, cell_contents=''):
-        row, col = self.find_location(location) # To access cell in matrix, subtract 1 from the row and column values
+        row, col = self.convert_location_to_indices(location) # To access cell in matrix, subtract 1 from the row and column values
         self.row = row
         self.col = col
         self.cell_contents = cell_contents
 
-    #check to make sure not greater than 9999 or less than 1 
-    def check_valid_cell_locations(self, location):
-        pass
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
     # OUR MATRIX IS 0-INDEXED WHILE THE SPREADSHEET ITSELF IS ONE INDEXED; FIND LOCATION WILL GIVE 1-INDEXED VALUES
-    def find_location(self, location):
+    def convert_location_to_indices(self, location):
         row = ''
         col = ''
         for i in range(len(location)):
