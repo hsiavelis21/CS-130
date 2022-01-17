@@ -37,11 +37,9 @@ class CellContents:
     # possible types: formula, string, literal value, empty cell (none type)
     def find_type(self, contents=''):
         if contents == '':
-            print('1')
             return 'EMPTY'
 
         if contents[0] == "'":
-            print('2')
             return 'STRING'
 
         if contents[0] == '=':
