@@ -1,13 +1,13 @@
-import CellContents
+from CellContents import CellContents
 
 class Cell:
     
     # location is in format [col][row]; i.e. BR453
     def __init__(self, location, cell_contents=''):
-        row, col = self.convert_location_to_indices(location).upper() # To access cell in matrix, subtract 1 from the row and column values
+        row, col = self.convert_location_to_indices(location.upper()) # row, col are 1 indexed
         self.row = row
         self.col = col
-        self.cell_contents = cell_contents
+        self.cell_contents = CellContents(cell_contents)
 
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
@@ -47,18 +47,28 @@ class Cell:
         return self.cell_contents.get_contents()
 
     def set_cell_contents(self, new_contents):
-        self.set_contents(new_contents)
+        self.cell_contents.set_contents(new_contents)
 
     # Return cell's value 
     def get_cell_value(self):
         return self.cell_contents.get_value()
 
     def set_cell_value(self, new_contents):
-        self.set_value(new_contents)
+        self.cell_contents.set_value(self.find_cell_type(new_contents), new_contents)
+
+    def get_cell_type(self):
+        return self.cell_contents.get_type()
+
+    def set_cell_type(self, new_type):
+        self.set_type(new_type)
+
+    def find_cell_type(self, contents):
+        return self.cell_contents.find_type(contents)
 
     def set_cell_index(self, r, c):
         self.row = r
         self.col = c
+
 
     def get_cell_index(self):
         return (self.row, self.col)

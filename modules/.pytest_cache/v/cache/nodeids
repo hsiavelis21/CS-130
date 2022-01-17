@@ -1,6 +1,12 @@
 [
   "test_Cell.py::test_find_location",
+  "test_CellContents.py::test_constructor",
   "test_CellContents.py::test_filter_contents",
   "test_CellContents.py::test_get_contents",
-  "test_Spreadsheet.py::test_spreadsheet"
+  "test_Spreadsheet.py::test_convert_indices_to_location",
+  "test_Spreadsheet.py::test_set_and_get_spreadsheet_cell_contents",
+  "test_Spreadsheet.py::test_set_spreadsheet_cell_contents",
+  "test_Spreadsheet.py::test_spreadsheet",
+  "test_Spreadsheet.py::test_spreadsheet1",
+  "test_Spreadsheet.py::test_spreadsheet_getters_and_setters"
 ]
