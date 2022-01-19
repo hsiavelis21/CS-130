@@ -43,25 +43,16 @@ class Workbook:
         # workbook's internal state.
         return self.spreadsheet_list
 
-
-    #helper function that checks if the sheet name is already taken
-    def check_valid_name(self, sheet_name):
-        for i in range(self.num_sheets()):
-            #Todo: quotation marks are excluded, no starting or ending with whitespace,
-            #and cannot be the empty string
-            #if name is empty string, raise value error 
-            if sheet_name == '':
-               return False 
-            if self.spreadsheet_list[i].name.lower() == sheet_name.lower():
-                return False  
-        return True
-
     #generates a spreadsheet name that is valid
     def generate_spreadsheet_name(self):
         curr_number = self.num_sheets
         new_name = "Sheet" + str(curr_number)
 
-        while not self.check_valid_name(new_name):
+        curr_spreadsheet_names = set()
+        for s in self.spreadsheet_list:
+            curr_spreadsheet_names.add(s.get_name().lower())
+
+        while new_name.lower() in curr_spreadsheet_names:
             curr_number += 1
             new_name = "Sheet" + str(curr_number)
 
@@ -81,19 +72,28 @@ class Workbook:
         # If the spreadsheet name is an empty string (not None), or it is
         # otherwise invalid, a ValueError is raised.
 
-        #checks if 
-        if not self.check_valid_name(sheet_name):
-            raise ValueError("Invalid Spreadsheet Name")
-       
-        #create a new spreadsheet object
+        new_name = ''
+
         #if name is None, generate name ***create a new function for name
         if sheet_name == None:
-            sheet_name = self.generate_spreadsheet_name(self.num_sheets)
+            new_name = self.generate_spreadsheet_name()
 
-        curr_sheet = Spreadsheet(sheet_name)
+        # Checks if sheet_name is empty string or if it has leading or trailing white spaces
+        if sheet_name.strip() != sheet_name or sheet_name == '':
+            raise ValueError('Invalid sheet name.')
+
+        # Checks if sheet_name already exists in workbook (case insensitive)
+        curr_spreadsheet_names = set()
+        for s in self.spreadsheet_list:
+            curr_spreadsheet_names.add(s.get_name().lower())
+
+        if sheet_name.lower() in curr_spreadsheet_names:
+            raise ValueError('Invalid sheet name.')
+
+        curr_sheet = Spreadsheet(new_name)
         self.spreadsheet_list.append(curr_sheet)
 
-        return (self.num_sheets() - 1, sheet_name)
+        return (len(self.spreadsheet_list) - 1, new_name)
 
     def del_sheet(self, sheet_name: str) -> None:
         # Delete the spreadsheet with the specified name.
