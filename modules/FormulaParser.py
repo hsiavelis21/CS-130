@@ -19,9 +19,7 @@ If an error, the cell value set to the error. Error types for formula parsing ar
     is #NAME?
 """
 from operator import add, sub, mul, truediv as div, neg, pos, concat
-from CellErrorType import CellErrorType
-from CellError import CellError
-from sheets import Workbook
+import sheets
 import decimal
 from lark import *
 from lark.visitors import Interpreter, visit_children_decor
@@ -112,21 +110,45 @@ class ParseFormula():
             self.formula = "=#ERROR!"
             self.tree = self.formula_parser.parse(self.formula)
 
+        
+
             #CellErrorType.TYPE_ERROR
             #the formula parser sets the value, not the contents
             #according to the spec, the cell contents correspond to the string representation
             #of the error while the value is the corresponding
-       
+    
 
-    #prints tree nicely
-    def print_tree_pretty(self):
-        print(self.tree.pretty())
+
+    def check_for_circular_refs(self):
+        curr_workbook = self.workbook
+        curr_formula = self.formula
+        lst = EvaluateFormula(self.workbook).visit_children(self.tree)
+        print(lst)
 
     def evaluate_tree(self):
         return EvaluateFormula(self.workbook).visit(self.tree)
 
 
 # DO REF ERROR AND CIRC ERROR
+
+
+if __name__ == "__main__":
+    workbook_2 = sheets.Workbook()
+    index, sheet_name = workbook_2.new_sheet("SHEET2")
+    workbook_2.set_cell_contents("SHEET2", "A1", "test")
+
+
+    parse_tree = ParseFormula("=SHEET2!A1", workbook_2)
+    
+
+
+    #need to check normal reference 
+    #also check reference in arithmetic and string concatenation
+    #make sure to parse names corrcetly 
+    #auto updating of cells
+    #do concat with non strings
+    #empty cells with arithmetic and empty cells with concatenation
+    #if error in cell, make sure cell has right error
 
 
    

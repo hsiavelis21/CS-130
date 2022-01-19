@@ -1,4 +1,4 @@
-from CellContents import CellContents
+import CellContents
 
 class Cell:
     
@@ -8,7 +8,7 @@ class Cell:
         self.row = row
         self.col = col
         self.workbook = wrkbk
-        self.cell_contents = CellContents(cell_contents, wrkbk)
+        self.cell_contents = CellContents.CellContents(cell_contents, wrkbk)
 
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
