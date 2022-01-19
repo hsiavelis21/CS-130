@@ -1,7 +1,7 @@
 from decimal import *
 import FormulaParser
-from modules.CellError import CellError
-from modules.CellErrorType import CellErrorType
+from CellError import CellError
+from CellErrorType import CellErrorType
 class CellContents:
 
     def __init__(self, contents='', wrkbk =''):
