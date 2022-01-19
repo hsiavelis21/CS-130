@@ -1,12 +1,13 @@
 from decimal import *
 import FormulaParser
-from CellError import CellError
-from CellErrorType import CellErrorType
+import CellError
+import CellErrorType
+
 class CellContents:
 
     def __init__(self, contents='', wrkbk =''):
         self.contents = self.filter_contents(contents)
-        self.workbook = self.wrkbk
+        self.workbook = wrkbk
         self.type = self.find_type(contents)
         self.value = ''
         self.set_value(self.type, contents, self.workbook)
@@ -98,17 +99,17 @@ class CellContents:
 
             #CHECK IF AN ERROR 
             if self.value == "#ERROR!":
-                self.contents = CellErrorType.PARSE_ERROR
+                self.contents = CellErrorType.CellErrorType.PARSE_ERROR
             elif self.value == "#CIRCREF!":
-                self.set_contentS = CellErrorType.CIRCULAR_REFERENCE
+                self.set_contentS = CellErrorType.CellErrorType.CIRCULAR_REFERENCE
             elif self.value == "#REF!":
-                self.set_contents = CellErrorType.BAD_REFERENCE
+                self.set_contents = CellErrorType.CellErrorType.BAD_REFERENCE
             elif self.value == "#NAME?":
-                self.set_contents = CellErrorType.BAD_NAME
+                self.set_contents = CellErrorType.CellErrorType.BAD_NAME
             elif self.value == "#VALUE!":
-                self.set_contents = CellErrorType.TYPE_ERROR
+                self.set_contents = CellErrorType.CellErrorType.TYPE_ERROR
             elif self.value == "#DIV/0!":
-                self.set_contentX = CellErrorType.DIVIDE_BY_ZERO
+                self.set_contentX = CellErrorType.CellErrorType.DIVIDE_BY_ZERO
             
         if contents_type == 'LITERAL':
             # REMOVE ALL TRAILING ZEROS FROM CONTENTS

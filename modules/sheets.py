@@ -1,5 +1,6 @@
 from typing import *
 import Spreadsheet
+import FormulaParser
 
 #==============================================================================
 # Caltech CS130 - Winter 2022
@@ -90,7 +91,7 @@ class Workbook:
         if sheet_name.lower() in curr_spreadsheet_names:
             raise ValueError('Invalid sheet name.')
 
-        curr_sheet = Spreadsheet(new_name)
+        curr_sheet = Spreadsheet.Spreadsheet(sheet_name)
         self.spreadsheet_list.append(curr_sheet)
 
         return (len(self.spreadsheet_list) - 1, new_name)
@@ -152,7 +153,7 @@ class Workbook:
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 #get the cell and change contents
-                curr_sheet.set_spreadsheet_cell_contents(location, contents, self)
+                curr_sheet.set_spreadsheet_cell_contents(location, contents, self.list_sheets())
                 return
         
         raise KeyError("Specified sheet name is not found.")
