@@ -9,6 +9,7 @@ cell6 = Cell('SH1001')
 cell7 = Cell('XYZ99')
 cell8 = Cell('EFGH1234')
 cell9 = Cell('ZZZZ9999') 
+cell10 = Cell('A2', '      ')
 
 def test_find_location():
     assert(cell1.get_row() == 1)
@@ -30,4 +31,7 @@ def test_find_location():
     assert(cell9.get_row() == 9999)
     assert(cell9.get_col() == 475254)
 
+    assert(cell9.get_cell_type() == 'EMPTY')
+    assert(cell9.get_cell_contents() == None)
+    assert(cell10.get_cell_contents() == None)
    
