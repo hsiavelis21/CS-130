@@ -16,6 +16,9 @@ import FormulaParser
 
 
 class Workbook:
+
+    # NEED TO DO VERSION
+
     # A workbook containing zero or more named spreadsheets.
     #
     # Any and all operations on a workbook that may affect calculated cell
@@ -46,7 +49,7 @@ class Workbook:
 
     #generates a spreadsheet name that is valid
     def generate_spreadsheet_name(self):
-        curr_number = self.num_sheets
+        curr_number = self.num_sheets() + 1
         new_name = "Sheet" + str(curr_number)
 
         curr_spreadsheet_names = set()
@@ -73,27 +76,36 @@ class Workbook:
         # If the spreadsheet name is an empty string (not None), or it is
         # otherwise invalid, a ValueError is raised.
 
-        new_name = ''
+        new_name = sheet_name
 
-        #if name is None, generate name ***create a new function for name
+        valid_chars = set(['.', '?', ':', ';', '!', '@', '#', '$', '%',
+        '^', '&', '*', '(', ')', '-', '_'])
+
+        #if name is None, generate name
         if sheet_name == None:
             new_name = self.generate_spreadsheet_name()
-
+        else:
         # Checks if sheet_name is empty string or if it has leading or trailing white spaces
-        if sheet_name.strip() != sheet_name or sheet_name == '':
-            raise ValueError('Invalid sheet name.')
+            if sheet_name.strip() != sheet_name or sheet_name == '':
+                raise ValueError('Invalid sheet name.')
 
-        # Checks if sheet_name already exists in workbook (case insensitive)
-        curr_spreadsheet_names = set()
-        for s in self.spreadsheet_list:
-            curr_spreadsheet_names.add(s.get_name().lower())
+            # Checks if sheet_name already exists in workbook (case insensitive)
+            curr_spreadsheet_names = set()
+            for s in self.spreadsheet_list:
+                curr_spreadsheet_names.add(s.get_name().lower())
 
-        if sheet_name.lower() in curr_spreadsheet_names:
-            raise ValueError('Invalid sheet name.')
+            if sheet_name.lower() in curr_spreadsheet_names:
+                raise ValueError('Invalid sheet name.')
 
-        curr_sheet = Spreadsheet.Spreadsheet(sheet_name)
+            if '"' in sheet_name or "'" in sheet_name:
+                raise ValueError('Invalid sheet name.')
+
+            for letter in sheet_name:
+                if not letter.isalnum() and letter not in valid_chars:
+                    raise ValueError('Invalid sheet name.') 
+
+        curr_sheet = Spreadsheet.Spreadsheet(new_name)
         self.spreadsheet_list.append(curr_sheet)
-
         return (len(self.spreadsheet_list) - 1, new_name)
 
     def del_sheet(self, sheet_name: str) -> None:
@@ -104,7 +116,7 @@ class Workbook:
         #
         # If the specified sheet name is not found, a KeyError is raised.
 
-        for i in range(self.num_sheets):
+        for i in range(self.num_sheets()):
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 self.spreadsheet_list.pop(i)
@@ -119,7 +131,7 @@ class Workbook:
         #
         # If the specified sheet name is not found, a KeyError is raised.
 
-        for i in range(self.num_sheets):
+        for i in range(self.num_sheets()):
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 return curr_sheet.get_extent()
