@@ -14,10 +14,9 @@ import FormulaParser
 #
 #     https://docs.python.org/3/library/typing.html
 
+version = '1.0.0'
 
 class Workbook:
-
-    # NEED TO DO VERSION
 
     # A workbook containing zero or more named spreadsheets.
     #
