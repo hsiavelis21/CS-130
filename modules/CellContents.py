@@ -5,6 +5,7 @@ class CellContents:
 
         self.contents = self.filter_contents(contents)
         self.type = self.find_type(contents)
+        self.value = ''
         self.value = self.set_value(self.type, contents)
         self.references = []
 
@@ -15,7 +16,7 @@ class CellContents:
     def set_contents(self, new_content):
         self.contents = self.filter_contents(new_content)
         self.type = self.find_type(new_content)
-        self.value = self.set_value(self.type, new_content)
+        self.set_value(self.type, new_content)
         #incorporate references here 
 
 
