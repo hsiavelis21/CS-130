@@ -153,7 +153,7 @@ def test_no_cell_ref_cell_errors():
 
 
 #testing cell reference arithmetic with only cells from one sheet
-workbook_1 = Workbook()
+workbook_1 = sheets.Workbook()
 index, sheet_name = workbook_1.new_sheet("SHEET1")
 workbook_1.set_cell_contents("SHEET1", "A1", "1")
 workbook_1.set_cell_contents("SHEET1", "A2", "2")
@@ -181,7 +181,7 @@ def test_cell_ref_arithmetic_one_sheet():
     assert(r_tree9.evaluate_tree() == decimal.Decimal("-3"))
 
 #testing cell reference string concatenation with only cells from one sheet
-workbook_2 = Workbook()
+workbook_2 = sheets.Workbook()
 index, sheet_name = workbook_2.new_sheet("SHEET2")
 workbook_2.set_cell_contents("SHEET2", "A1", "test")
 workbook_2.set_cell_contents("SHEET2", "A2", "test    ")

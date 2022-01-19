@@ -44,10 +44,28 @@ class EvaluateFormula(Interpreter):
 
     @visit_children_decor
     def cell(self, tree):
-        curr_cell = tree[1]
-        curr_spreadsheet = tree[0]
-        cell_value = self.workbook.get_cell_value(curr_spreadsheet, curr_cell)
 
+        if(len(tree) ==1): #spreadsheet name is not specified
+            return "#REF!"
+
+
+        curr_cell = tree[1]
+
+        curr_spreadsheet = tree[0]
+
+        if not self.workbook.list_sheets().contains(curr_spreadsheet):
+            return "#REF!"
+
+
+        try:    
+            cell_value = self.workbook.get_cell_value(curr_spreadsheet, curr_cell)
+        except KeyError: 
+            print(1)
+            return "#REF!" #FIXXXXX
+
+        if cell_value == None: 
+            print(2)
+            return "#REF!" #FIXXXX
         return cell_value
     
     @visit_children_decor   
@@ -57,11 +75,9 @@ class EvaluateFormula(Interpreter):
     @visit_children_decor   
     def add_expr(self, tree):
         oper = tree[1]
-        print(1)
 
         try:
             if oper == '+':
-                print(1)
                 return add(tree[0], tree[2])
             return sub(tree[0], tree[2])
         except TypeError:
@@ -123,22 +139,24 @@ class ParseFormula():
         curr_workbook = self.workbook
         curr_formula = self.formula
         lst = EvaluateFormula(self.workbook).visit_children(self.tree)
-        print(lst)
 
     def evaluate_tree(self):
         return EvaluateFormula(self.workbook).visit(self.tree)
 
 
-# DO REF ERROR AND CIRC ERROR
+# DO REF CIRC ERROR
 
 
 if __name__ == "__main__":
     workbook_2 = sheets.Workbook()
     index, sheet_name = workbook_2.new_sheet("SHEET2")
-    workbook_2.set_cell_contents("SHEET2", "A1", "test")
+    workbook_2.set_cell_contents("SHEET2", "A1", "1")
+    workbook_2.set_cell_contents("SHEET2", "A2", "2")
+    #workbook_2.set_cell_contents("SHEET2", "B3", "=SHEET2!A1 + SHEET2!A2")
 
 
-    parse_tree = ParseFormula("=SHEET2!A1", workbook_2)
+    parse_tree = ParseFormula("=SHEET2!B3", workbook_2)
+    print(parse_tree.evaluate_tree())
     
 
 
