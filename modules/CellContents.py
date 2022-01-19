@@ -1,21 +1,26 @@
 from decimal import *
+import FormulaParser
+from modules.CellError import CellError
+from modules.CellErrorType import CellErrorType
 class CellContents:
 
-    def __init__(self, contents=''):
+    def __init__(self, contents='', wrkbk =''):
         self.contents = self.filter_contents(contents)
+        self.workbook = self.wrkbk
         self.type = self.find_type(contents)
         self.value = ''
-        self.set_value(self.type, contents)
+        self.set_value(self.type, contents, self.workbook)
         self.references = []
 
     def get_contents(self):
         return self.contents
         
 
-    def set_contents(self, new_content):
+    def set_contents(self, new_content, new_workbook):
         self.contents = self.filter_contents(new_content)
+        self.workbook = new_workbook
         self.type = self.find_type(new_content)
-        self.set_value(self.type, new_content)
+        self.set_value(self.type, new_content, new_workbook)
         #incorporate references here 
 
 
@@ -44,6 +49,9 @@ class CellContents:
 
         if contents[0] == '=':
             return 'FORMULA'
+        
+        if contents[0] == '#':
+            return 'ERROR'
 
         else:
             dot_count = 0
@@ -72,7 +80,7 @@ class CellContents:
         # invalid for some reason, this method does not raise an exception;
         # rather, the cell's value will be a CellError object indicating the
         # naure of the issue.
-    def set_value(self, contents_type, contents):
+    def set_value(self, contents_type, contents, workbook):
         # self.value = ???
 
         if contents_type == 'EMPTY':
@@ -85,7 +93,22 @@ class CellContents:
                 self.value = contents
 
         if contents_type == 'FORMULA':
-            print('FORMULA NOT SUPPORTED CURRENTLY')
+            curr_tree =  FormulaParser.ParseFormula(contents, workbook)
+            self.value = curr_tree.evaluate_tree()
+
+            #CHECK IF AN ERROR 
+            if self.value == "#ERROR!":
+                self.contents = CellErrorType.PARSE_ERROR
+            elif self.value == "#CIRCREF!":
+                self.set_contentS = CellErrorType.CIRCULAR_REFERENCE
+            elif self.value == "#REF!":
+                self.set_contents = CellErrorType.BAD_REFERENCE
+            elif self.value == "#NAME?":
+                self.set_contents = CellErrorType.BAD_NAME
+            elif self.value == "#VALUE!":
+                self.set_contents = CellErrorType.TYPE_ERROR
+            elif self.value == "#DIV/0!":
+                self.set_contentX = CellErrorType.DIVIDE_BY_ZERO
             
         if contents_type == 'LITERAL':
             # REMOVE ALL TRAILING ZEROS FROM CONTENTS

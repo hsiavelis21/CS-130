@@ -1,7 +1,5 @@
 from typing import *
-import CellError
-from Spreadsheet import Spreadsheet
-
+import Spreadsheet
 
 #==============================================================================
 # Caltech CS130 - Winter 2022
@@ -154,7 +152,7 @@ class Workbook:
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 #get the cell and change contents
-                curr_sheet.set_spreadsheet_cell_contents(location, contents)
+                curr_sheet.set_spreadsheet_cell_contents(location, contents, self)
                 return
         
         raise KeyError("Specified sheet name is not found.")

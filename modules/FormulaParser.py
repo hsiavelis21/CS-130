@@ -126,14 +126,7 @@ class ParseFormula():
         return EvaluateFormula(self.workbook).visit(self.tree)
 
 
-if __name__ == '__main__':
-
-    parse_tree = ParseFormula("= + 1 ")
-    print(parse_tree.evaluate_tree()) #returing none for cell refs
-
-
-
-# DO REF AND CIRC ERRORS
+# DO REF ERROR AND CIRC ERROR
 
 
    

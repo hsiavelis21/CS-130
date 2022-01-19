@@ -3,11 +3,12 @@ from CellContents import CellContents
 class Cell:
     
     # location is in format [col][row]; i.e. BR453
-    def __init__(self, location, cell_contents=''):
+    def __init__(self, location, cell_contents='', wrkbk = ''):
         row, col = self.convert_location_to_indices(location.upper()) # row, col are 1 indexed
         self.row = row
         self.col = col
-        self.cell_contents = CellContents(cell_contents)
+        self.workbook = wrkbk
+        self.cell_contents = CellContents(cell_contents, wrkbk)
 
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
@@ -46,15 +47,15 @@ class Cell:
     def get_cell_contents(self):
         return self.cell_contents.get_contents()
 
-    def set_cell_contents(self, new_contents):
-        self.cell_contents.set_contents(new_contents)
+    def set_cell_contents(self, new_contents, new_workbook):
+        self.cell_contents.set_contents(new_contents, new_workbook)
 
     # Return cell's value 
     def get_cell_value(self):
         return self.cell_contents.get_value()
 
-    def set_cell_value(self, new_contents):
-        self.cell_contents.set_value(self.find_cell_type(new_contents), new_contents)
+    def set_cell_value(self, new_contents, new_workbook):
+        self.cell_contents.set_value(self.find_cell_type(new_contents), new_contents, new_workbook)
 
     def get_cell_type(self):
         return self.cell_contents.get_type()
