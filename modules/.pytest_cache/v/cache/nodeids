@@ -3,7 +3,12 @@
   "test_CellContents.py::test_filter_contents",
   "test_CellContents.py::test_get_contents",
   "test_FormulaParser.py::test_cell_errors",
+  "test_FormulaParser.py::test_cell_ref_arithmetic_one_sheet",
+  "test_FormulaParser.py::test_cell_ref_concat_one_sheet",
   "test_FormulaParser.py::test_evaluating_arithmetic",
   "test_FormulaParser.py::test_evaluating_concat",
+  "test_FormulaParser.py::test_no_cell_ref_arithmetic",
+  "test_FormulaParser.py::test_no_cell_ref_cell_errors",
+  "test_FormulaParser.py::test_no_cell_ref_concat",
   "test_Spreadsheet.py::test_spreadsheet"
 ]

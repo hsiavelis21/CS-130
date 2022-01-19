@@ -1,3 +1,5 @@
 {
+  "test_FormulaParser.py::test_cell_ref_concat_one_sheet": true,
+  "test_FormulaParser.py::test_evaluating_concat": true,
   "test_Spreadsheet.py::test_spreadsheet": true
 }

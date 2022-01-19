@@ -18,7 +18,6 @@ If an error, the cell value set to the error. Error types for formula parsing ar
     4.  BAD_NAME --> a function name in a formula is unrecognized; string representation
     is #NAME?
 """
-from logging import exception
 from operator import add, sub, mul, truediv as div, neg, pos, concat
 from CellErrorType import CellErrorType
 from CellError import CellError

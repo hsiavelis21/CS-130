@@ -13,7 +13,7 @@ tree7 =  ParseFormula('=1 - +2')
 tree8 =  ParseFormula('=(1 + 2) * 3')
 tree9 =  ParseFormula('=1 - 2 * 2') 
 
-def test_evaluating_arithmetic():
+def test_no_cell_ref_arithmetic():
     assert(tree1.evaluate_tree() == decimal.Decimal('3'))
     assert(tree2.evaluate_tree() == decimal.Decimal('2'))
     assert(tree3.evaluate_tree() == decimal.Decimal('2'))
@@ -51,7 +51,7 @@ tree32 = ParseFormula("=\"   \" & \"again     \"")
 tree33 = ParseFormula("=\"   \" & \"     again\"")
 tree34 = ParseFormula("=\"   \" & \"    again    \"")
 
-def test_evaluating_concat():
+def test_no_cell_ref_concat():
     assert(tree10.evaluate_tree() == str("   "))
     assert(tree11.evaluate_tree() == str("test"))
     assert(tree12.evaluate_tree() == str("test    "))
@@ -120,7 +120,7 @@ value_error = "#VALUE!"
 error_error = "#ERROR!"
 div_error = "#DIV/0!"
 
-def test_cell_errors():
+def test_no_cell_ref_cell_errors():
     assert(tree35.evaluate_tree() == div_error)
     assert(tree36.evaluate_tree() == value_error)
     assert(tree37.evaluate_tree() == value_error)
@@ -151,13 +151,104 @@ def test_cell_errors():
     assert(tree63.evaluate_tree() == error_error)
 
 
-#testing cell reference arithmetic
+#testing cell reference arithmetic with only cells from one sheet
 workbook_1 = Workbook()
 index, sheet_name = workbook_1.new_sheet("SHEET1")
 workbook_1.set_cell_contents("SHEET1", "A1", "1")
 workbook_1.set_cell_contents("SHEET1", "A2", "2")
+workbook_1.set_cell_contents("SHEET1", "F3", "3")
 
-parse_tree = ParseFormula("= SHEET1!A1 + SHEET1!A2", workbook_1)
+r_tree1 =  ParseFormula(('=SHEET1!A1 + SHEET1!A2'), workbook_1)
+r_tree2 =  ParseFormula(('=SHEET1!A1 * SHEET1!A2'),workbook_1 ) 
+r_tree3 =  ParseFormula(('=SHEET1!A1 - SHEET1!A2'), workbook_1) 
+r_tree4 =  ParseFormula(('=SHEET1!A1 / SHEET1!A2'), workbook_1)
+r_tree5 =  ParseFormula(('=SHEET1!A2 - SHEET1!A1'), workbook_1)
+r_tree6 =  ParseFormula(('=SHEET1!A1 -  -SHEET1!A2'), workbook_1)
+r_tree7 =  ParseFormula(('=SHEET1!A1 - +SHEET1!A2'), workbook_1)
+r_tree8 =  ParseFormula(('=(SHEET1!A1 + SHEET1!A2) * SHEET1!F3'), workbook_1)
+r_tree9 =  ParseFormula(('=SHEET1!A1 - SHEET1!A2 * SHEET1!A2'), workbook_1)
+
+def test_cell_ref_arithmetic_one_sheet():
+    assert(r_tree1.evaluate_tree() == decimal.Decimal("3"))
+    assert(r_tree2.evaluate_tree() == decimal.Decimal("2"))
+    assert(r_tree3.evaluate_tree() == decimal.Decimal("-1"))
+    assert(r_tree4.evaluate_tree() == decimal.Decimal(".5"))
+    assert(r_tree5.evaluate_tree() == decimal.Decimal("1"))
+    assert(r_tree6.evaluate_tree() == decimal.Decimal("3"))
+    assert(r_tree7.evaluate_tree() == decimal.Decimal("-1"))
+    assert(r_tree8.evaluate_tree() == decimal.Decimal("9"))
+    assert(r_tree9.evaluate_tree() == decimal.Decimal("-3"))
+
+#testing cell reference string concatenation with only cells from one sheet
+workbook_2 = Workbook()
+index, sheet_name = workbook_2.new_sheet("SHEET2")
+workbook_2.set_cell_contents("SHEET2", "A1", "test")
+workbook_2.set_cell_contents("SHEET2", "A2", "test    ")
+workbook_2.set_cell_contents("SHEET2", "A3", "   test    ")
+workbook_2.set_cell_contents("SHEET2", "A4", "   test")
+workbook_2.set_cell_contents("SHEET2", "A5", "again")
+workbook_2.set_cell_contents("SHEET2", "A6", "again   ")
+workbook_2.set_cell_contents("SHEET2", "A7", "   again")
+workbook_2.set_cell_contents("SHEET2", "A8", "   again   ")
+
+
+r_tree10 =  ParseFormula("=     ", workbook_2)
+r_tree11 =  ParseFormula("=SHEET2!A1", workbook_2)
+r_tree12 =  ParseFormula("=SHEET2!A1 & \"   \"", workbook_2)
+r_tree13 =  ParseFormula("=\"    \" & SHEET2!A1 ", workbook_2)
+r_tree14 =  ParseFormula("=\"    \" & SHEET2!A1 & \"   \" ", workbook_2)
+r_tree15 =  ParseFormula("=SHEET2!A5", workbook_2)
+r_tree16 =  ParseFormula("=SHEET2!A5 & \"   \"", workbook_2)
+r_tree17 =  ParseFormula("=\"    \" & SHEET2!A5 ", workbook_2)
+r_tree18 =  ParseFormula("=\"    \" & SHEET2!A5 & \"   \" ", workbook_2)
+r_tree19 =  ParseFormula("=SHEET2!A1 & SHEET2!A5", workbook_2)
+r_tree20 =  ParseFormula("=SHEET2!A1 & SHEET2!A6", workbook_2)
+r_tree21 =  ParseFormula("=SHEET2!A1 & SHEET2!A7", workbook_2)
+r_tree22 =  ParseFormula("=SHEET2!A1 & SHEET2!A8", workbook_2)
+r_tree23 =  ParseFormula("=SHEET2!A2 & SHEET2!A5", workbook_2)
+r_tree24 =  ParseFormula("=SHEET2!A2 & SHEET2!A6", workbook_2)
+r_tree25 =  ParseFormula("=SHEET2!A2 & SHEET2!A7", workbook_2)
+r_tree26 =  ParseFormula("=SHEET2!A2 & SHEET2!A8", workbook_2)
+r_tree27 =  ParseFormula("=SHEET2!A3 & SHEET2!A5", workbook_2)
+r_tree28 =  ParseFormula("=SHEET2!A3 & SHEET2!A6", workbook_2)
+r_tree29 =  ParseFormula("=SHEET2!A3 & SHEET2!A7", workbook_2)
+r_tree30 =  ParseFormula("=SHEET2!A3 & SHEET2!A8", workbook_2)
+r_tree31 =  ParseFormula("=SHEET2!A4 & SHEET2!A5", workbook_2)
+r_tree32 =  ParseFormula("=SHEET2!A4 & SHEET2!A6", workbook_2)
+r_tree33 =  ParseFormula("=SHEET2!A4 & SHEET2!A7", workbook_2)
+r_tree34 =  ParseFormula("=SHEET2!A4 & SHEET2!A8", workbook_2)
+
+
+def test_cell_ref_concat_one_sheet():
+    #assert(r_tree10.evaluate_tree() == str("   "))
+    assert(r_tree11.evaluate_tree() == str("test"))
+    assert(r_tree12.evaluate_tree() == str("test   "))
+    assert(r_tree13.evaluate_tree() == str("    test"))
+    assert(r_tree14.evaluate_tree() == str("    test   "))
+    assert(r_tree15.evaluate_tree() == str("again"))
+    assert(r_tree16.evaluate_tree() == str("again   "))
+    assert(r_tree17.evaluate_tree() == str("    again"))
+    assert(r_tree18.evaluate_tree() == str("    again   "))
+    assert(r_tree19.evaluate_tree() == str("= \"test\" & SHEET2!A5"))
+    assert(r_tree20.evaluate_tree() == str("=\"test\" & SHEET2!A6"))
+    assert(r_tree21.evaluate_tree() == str("=\"test\" & SHEET2!A7"))
+    assert(r_tree22.evaluate_tree() == str("=\"test\" & SHEET2!A8"))
+    assert(r_tree23.evaluate_tree() == str("=\"test    \" & SHEET2!A5"))
+    assert(r_tree24.evaluate_tree() == str("=\"test    \" & SHEET2!A6"))
+    assert(r_tree25.evaluate_tree() == str("=\"test    \" & SHEET2!A7"))
+    assert(r_tree26.evaluate_tree() == str("=\"test    \" & SHEET2!A8"))
+    assert(r_tree27.evaluate_tree() == str("=SHEET2!A3 & SHEET2!A5"))
+    assert(r_tree28.evaluate_tree() == str("=SHEET2!A3 & SHEET2!A6"))
+    assert(r_tree29.evaluate_tree() == str("=SHEET2!A3 & SHEET2!A7"))
+    assert(r_tree30.evaluate_tree() == str("=SHEET2!A3 & SHEET2!A8"))
+    assert(r_tree31.evaluate_tree() == str("=SHEET2!A4 & SHEET2!A5"))
+    assert(r_tree32.evaluate_tree() == str("=SHEET2!A4 & SHEET2!A6"))
+    assert(r_tree33.evaluate_tree() == str("=SHEET2!A4 & SHEET2!A7"))
+    assert(r_tree34.evaluate_tree() == str("=SHEET2!A4 & SHEET2!A8"))
+
+
+
+
 #testing cell reference errors
 
 
