@@ -1,6 +1,6 @@
 from typing import *
 import CellError
-from modules.Spreadsheet import Spreadsheet
+from Spreadsheet import Spreadsheet
 
 
 #==============================================================================
@@ -95,7 +95,7 @@ class Workbook:
         curr_sheet = Spreadsheet(sheet_name)
         self.spreadsheet_list.append(curr_sheet)
 
-        return (self.num_sheets - 1, sheet_name)
+        return (self.num_sheets() - 1, sheet_name)
 
     def del_sheet(self, sheet_name: str) -> None:
         # Delete the spreadsheet with the specified name.
@@ -150,7 +150,7 @@ class Workbook:
         # naure of the issue.
 
         #iterate through sheets
-        for i in range(self.num_sheets):
+        for i in range(self.num_sheets()):
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 #get the cell and change contents
@@ -177,7 +177,7 @@ class Workbook:
         #
         # This method will never return a zero-length string; instead, empty
         # cells are indicated by a value of None.
-        for i in range(self.num_sheets):
+        for i in range(self.num_sheets()):
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 #get the cell and change contents
@@ -204,12 +204,12 @@ class Workbook:
         # decimal place, and will not include a decimal place if the value is a
         # whole number.  For example, this function would not return
         # Decimal('1.000'); rather it would return Decimal('1').
-        for i in range(self.num_sheets):
+        for i in range(self.num_sheets()):
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 #get the cell and change contents
-                curr_sheet.get_spreadsheet_cell_value(location)
-                return
+                #curr_sheet.get_spreadsheet_cell_value(location)
+                return curr_sheet.get_spreadsheet_cell_value(location)
         
         raise KeyError("Specified sheet name is not found.")
 

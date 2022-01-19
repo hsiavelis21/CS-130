@@ -2,19 +2,20 @@ from decimal import *
 class CellContents:
 
     def __init__(self, contents=''):
-
         self.contents = self.filter_contents(contents)
-        #self.type = self.find_type(contents)
-        #self.value = self.set_value(self.type, contents)
+        self.type = self.find_type(contents)
+        self.value = ''
+        self.set_value(self.type, contents)
         self.references = []
 
     def get_contents(self):
         return self.contents
+        
 
     def set_contents(self, new_content):
         self.contents = self.filter_contents(new_content)
         self.type = self.find_type(new_content)
-        self.value = self.set_value(self.type, new_content)
+        self.set_value(self.type, new_content)
         #incorporate references here 
 
 
@@ -34,8 +35,7 @@ class CellContents:
     # input: filtered contents of cell (string input)
     # output: the type of the contents;
     # possible types: formula, string, literal value, empty cell (none type)
-    def find_type(contents):
-        
+    def find_type(self, contents=''):
         if contents == '':
             return 'EMPTY'
 
@@ -46,8 +46,9 @@ class CellContents:
             return 'FORMULA'
 
         else:
+            dot_count = 0
+
             for char in contents:
-                dot_count = 0
                 if char == '.':
                     dot_count += 1
 
@@ -86,7 +87,6 @@ class CellContents:
         if contents_type == 'FORMULA':
             print('FORMULA NOT SUPPORTED CURRENTLY')
             
-
         if contents_type == 'LITERAL':
             # REMOVE ALL TRAILING ZEROS FROM CONTENTS
             if '.' in contents:
@@ -94,6 +94,8 @@ class CellContents:
                     if contents[i] == '0':
                         contents = contents[:i]
                     else:
+                        if contents[i] == '.':
+                            contents = contents[:i]
                         break
             self.value = Decimal(contents)
 

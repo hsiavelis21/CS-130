@@ -107,8 +107,10 @@ class Spreadsheet:
 
                 new_row, new_col = self.convert_location_to_indices(location)
 
-                self.extent[0] = max(self.extent[0], new_col)
-                self.extent[1] = max(self.extent[1], new_row)
+                max_col = max(self.extent[0], new_col)
+                max_row = max(self.extent[1], new_row)
+
+                self.extent = (max_col, max_row)
 
     
     # If the cell at [row, col] does not exist, return the new extent of the spreadsheet. If row, col
@@ -134,16 +136,13 @@ class Spreadsheet:
 
     #gets an existing celll
     def get_spreadsheet_cell_contents(self, location):
-        if not location not in self.dict.keys():
+        if location not in self.dict.keys():
             raise ValueError("Not a valid cell location.")
-
         return self.dict[location].get_cell_contents()
 
     def get_spreadsheet_cell_value(self, location):
-
-        if not location not in self.dict.keys():
+        if location not in self.dict.keys():
             raise ValueError("Not a valid cell location.")
-
         return self.dict[location].get_cell_value()
 
         
