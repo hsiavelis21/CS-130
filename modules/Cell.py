@@ -10,7 +10,6 @@ class Cell:
         self.cell_contents = CellContents(cell_contents)
 
 
-
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
     # OUR MATRIX IS 0-INDEXED WHILE THE SPREADSHEET ITSELF IS ONE INDEXED; FIND LOCATION WILL GIVE 1-INDEXED VALUES
     def convert_location_to_indices(self, location):
@@ -27,8 +26,6 @@ class Cell:
 
         return(row, col)
 
-    def get_type(self):
-        return self.cell_contents.get_type()
 
     def cast_column_to_number(self, col):
     #col is a string of letters

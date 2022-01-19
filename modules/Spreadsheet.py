@@ -74,14 +74,13 @@ class Spreadsheet:
 
     #edits an EXISTING STATEMENTS or adds a NEW cell
     def set_spreadsheet_cell_contents(self, location, new_contents):
-
+        new_contents = new_contents.strip()
         # Convert location to indices on spreadsheet
         row, col = self.convert_location_to_indices(location)
 
         # Check if location is a valid location on the spreadsheet
         if row < 1 or row > 9999 or col < 1 or col > 475254:
-            #raise ValueError('Cell location is invalid.')
-            return "ValueError"
+            raise ValueError('Cell location is invalid.')
 
         new_cell = Cell(location, new_contents)
 
@@ -90,7 +89,7 @@ class Spreadsheet:
             curr_cell = self.dict[location]
 
             # CASE 1.1: New cell has empty contents
-            if new_cell.get_type() == 'EMPTY':
+            if new_cell.get_cell_type() == 'EMPTY':
             # Change extent and remove the cell out of the dictionary
                 del self.dict[location]
                 self.extent = self.get_new_extent(location)
@@ -101,16 +100,14 @@ class Spreadsheet:
        
         else:
         # CASE 2: Cell at specified location has empty contents
-            if new_cell.get_type() != 'EMPTY':
+            if new_cell.get_cell_type() != 'EMPTY':
 
                 self.dict[location] = new_cell
 
                 new_row, new_col = self.convert_location_to_indices(location)
+                
+                self.extent = (max(self.extent[0], new_col), max(self.extent[1], new_row))
 
-                max_col = max(self.extent[0], new_col)
-                max_row = max(self.extent[1], new_row)
-
-                self.extent = (max_col, max_row)
 
     
     # If the cell at [row, col] does not exist, return the new extent of the spreadsheet. If row, col
@@ -123,8 +120,8 @@ class Spreadsheet:
             return self.extent
 
         else:
-            max_row = row
-            max_col = col
+            max_row = 0
+            max_col = 0
 
             for cell in self.dict:
                 curr_row, curr_col = self.convert_location_to_indices(cell)
@@ -134,18 +131,29 @@ class Spreadsheet:
         return max_row, max_col
 
 
-    #gets an existing celll
+    #gets an existing cell
     def get_spreadsheet_cell_contents(self, location):
-        if location not in self.dict.keys():
-            raise ValueError("Not a valid cell location.")
+        row, col = self.convert_location_to_indices(location)
+        # Check if location is a valid location on the spreadsheet
+        if row < 1 or row > 9999 or col < 1 or col > 475254:
+            raise ValueError('Cell location is invalid.')
+        
+        # If location of cell on spreadsheet is empty:
+        if not location in self.dict.keys():
+            return None
+
         return self.dict[location].get_cell_contents()
 
     def get_spreadsheet_cell_value(self, location):
-        if location not in self.dict.keys():
-            raise ValueError("Not a valid cell location.")
-        return self.dict[location].get_cell_value()
+        row, col = self.convert_location_to_indices(location)
 
+        if row < 1 or row > 9999 or col < 1 or col > 475254:
+            raise ValueError('Cell location is invalid.')
         
+        if not location in self.dict.keys():
+            return None
+
+        return self.dict[location].get_cell_value()
 
 
 
