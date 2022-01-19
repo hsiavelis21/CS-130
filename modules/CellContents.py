@@ -101,15 +101,15 @@ class CellContents:
             if self.value == "#ERROR!":
                 self.contents = CellErrorType.CellErrorType.PARSE_ERROR
             elif self.value == "#CIRCREF!":
-                self.set_contentS = CellErrorType.CellErrorType.CIRCULAR_REFERENCE
+                self.contentS = CellErrorType.CellErrorType.CIRCULAR_REFERENCE
             elif self.value == "#REF!":
-                self.set_contents = CellErrorType.CellErrorType.BAD_REFERENCE
+                self.contents = CellErrorType.CellErrorType.BAD_REFERENCE
             elif self.value == "#NAME?":
-                self.set_contents = CellErrorType.CellErrorType.BAD_NAME
+                self.contents = CellErrorType.CellErrorType.BAD_NAME
             elif self.value == "#VALUE!":
-                self.set_contents = CellErrorType.CellErrorType.TYPE_ERROR
+                self.contents = CellErrorType.CellErrorType.TYPE_ERROR
             elif self.value == "#DIV/0!":
-                self.set_contentX = CellErrorType.CellErrorType.DIVIDE_BY_ZERO
+                self.contents = CellErrorType.CellErrorType.DIVIDE_BY_ZERO
             
         if contents_type == 'LITERAL':
             # REMOVE ALL TRAILING ZEROS FROM CONTENTS
