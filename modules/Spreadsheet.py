@@ -1,5 +1,4 @@
-from Cell import Cell
-
+import Cell
 class Spreadsheet:
 
     MAX_CELL = 'ZZZZ9999'
@@ -9,8 +8,9 @@ class Spreadsheet:
 
     # Empty sheet constructor
     # Properties of a spreadsheet: matrix of cells
-    def __init__(self, name = ""):
+    def __init__(self, name = "", wrkbk = ''):
         self.name = name
+        self.workbook = wrkbk
 
         # Extent is formatted as ([col], [row])
         self.extent = (0, 0)
@@ -73,7 +73,7 @@ class Spreadsheet:
         return num
 
     #edits an EXISTING STATEMENTS or adds a NEW cell
-    def set_spreadsheet_cell_contents(self, location, new_contents):
+    def set_spreadsheet_cell_contents(self, location, new_contents, new_workbook):
         new_contents = new_contents.strip()
         # Convert location to indices on spreadsheet
         row, col = self.convert_location_to_indices(location)
@@ -82,7 +82,7 @@ class Spreadsheet:
         if row < 1 or row > 9999 or col < 1 or col > 475254:
             raise ValueError('Cell location is invalid.')
 
-        new_cell = Cell(location, new_contents)
+        new_cell = Cell(location, new_contents, new_workbook)
 
         # Case 1: Cell at specified location has non-empty contents 
         if location in self.dict.keys():
@@ -95,8 +95,8 @@ class Spreadsheet:
                 self.extent = self.get_new_extent(location)
 
             else:
-                curr_cell.set_cell_contents(new_contents) # Note, referencing is done in abstraction layers
-                curr_cell.set_cell_value(new_contents)
+                curr_cell.set_cell_contents(new_contents, new_workbook) # Note, referencing is done in abstraction layers
+                curr_cell.set_cell_value(new_contents, new_workbook)
        
         else:
         # CASE 2: Cell at specified location has empty contents
