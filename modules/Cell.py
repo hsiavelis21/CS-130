@@ -91,8 +91,6 @@ class Cell:
             if references[i].get_index() == ref.get_index():
                 #remove since it is the same cell
                 self.remove_reference(i)
-        
-        
 
 
 
