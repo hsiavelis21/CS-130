@@ -19,8 +19,9 @@ If an error, the cell value set to the error. Error types for formula parsing ar
     is #NAME?
 """
 from operator import add, sub, mul, truediv as div, neg, pos, concat
-from turtle import numinput
-from modules.Spreadsheet import Spreadsheet
+import Spreadsheet
+import Cell
+import CellContents
 import sheets
 import decimal
 from lark import *
@@ -127,22 +128,16 @@ class ParseFormula():
     formula_parser = Lark.open('formulas.lark', start='formula')
     formula = formula_parser.parse
 
-    def __init__(self, input_formula='', wrkbk=None, src=None):
+    def __init__(self, input_formula='', wrkbk=None):
         self.formula =input_formula
         self.workbook = wrkbk
-        self.source = src
         try: 
             self.tree = self.formula_parser.parse(self.formula)
         except (UnexpectedEOF,UnexpectedCharacters):
             self.formula = "=#ERROR!"
             self.tree = self.formula_parser.parse(self.formula)
  
-
-#edges are references in cell_contents in each cell in each sheet
-#the refs are stored as strings in cell contents, but are stored as SHEET![COL][ROW]
-
-
-    #Creates the stack that is used to check for strongly connected components
+   #Creates the stack that is used to check for strongly connected components
     def DFS_iter(self, source):
         seen = set()
         #source is a cell location which is a string
@@ -152,12 +147,13 @@ class ParseFormula():
 
         while (len(stack) != 0):
             curr_cell_location = stack.pop()
-            curr_cell =  sheets.get_cell(curr_cell_location) #change to pass in cell location and sheet name
+            curr_cell_index, curr_cell_name = self.seperate_spdsheet_name(curr_cell_location)
+            curr_cell =  sheets.get_cell(curr_cell_index, curr_cell_name) 
             curr_refs = curr_cell.get_references() 
 
-            if curr_cell not in seen:
+            if curr_cell_location not in seen:
                 result.append(curr_cell_location)
-                seen.add(curr_cell)
+                seen.add(curr_cell_location)
                 for a, b in curr_refs:
                     stack.append(b)
         return result
@@ -169,46 +165,32 @@ class ParseFormula():
         adj_lst = [] #consists of cells represented by location
 
         for cell_location in reversed(stack):
-            curr_cell =  sheets.get_cell(cell_location) #change to pass in cell location and sheet name
+            curr_cell_index, curr_cell_name = self.seperate_spdsheet_name(cell_location)
+            curr_cell =  sheets.get_cell(curr_cell_index, curr_cell_name) 
             for a,b in curr_cell.get_references():
                 adj_lst.append((b,a))
         return adj_lst
 
-    def reverse_DFS_iter(self, stack, adj_lst):
+    #Goes through DFS in the reverse list and returns a list of cycles
+    def reverse_DFS_iter(stack, adj_lst):
         seen = set()
 
         cycles = []
         curr_cycle = []
 
         while (len(stack) != 0):
-
             curr_cell_location = stack.pop()
             if curr_cell_location not in seen:
                 seen.add(curr_cell_location)
-                curr_cell = sheets.get_cell(curr_cell_location) #change to pass in cell location and sheet name
-                curr_refs = curr_cell.get_references()
-                curr_cycle.append(b)
-
+                
+                curr_cycle.append(curr_cell_location) #starting with this cycle
                 for b,a in adj_lst:
-                    if b == curr_cell_location:
-                        #keeps track of all cells that reference the current cell
-                        curr_cycle.append(a)
-                        adj_cell_contents = sheets.get_cell_contents(a) #change to pass in cell location and sheet name
-                        adj_cell_contents.remove_reference(b) #lets the programmer know that the referenced cell has been parsed
-
-
-               if curr_cell not in seen:
-                result.append(curr_cell_location)
-                seen.add(curr_cell)
-                for a, b in curr_refs:
-                    stack.append(b)
-                    
-
-            #go through adj_lst and find all tuples whose first value is cell_location
-            #once got this tuple, evaluate contents PARSEEEE   
-            #set as seeen 
-
-
+                    if b == curr_cell_location: #found an edge 
+                        if a in curr_cycle:
+                            cycles.append(curr_cycle)
+                            curr_cycle = []
+                        stack.append(a)
+        return cycles
 
 
     #seen is a dictionary with keys as cells with values of whether seen or not
@@ -216,20 +198,100 @@ class ParseFormula():
 
     #updates spreadsheet and evaluates cells 
     #CALL THIS FUNCTION TO EVALUATE FORMUALS OUTSIDE OF FORMULA PARSER
-    def update_spreadsheet(self, source):
+    def evaluate_spreadsheet(self, source):
         #assume references are lists as SHEETNAME![COL][ROW]
+        
+        #Priorty 2, check for circular refs
         stack = self.DFS_iter(source)
-        #now stack is complete, so reverse it
         adj_list = self.reverse_stack(stack)
-        self.reverse_DFS_iter(stack, adj_list)
+        cycles = self.reverse_DFS_iter(stack, adj_list)
+
+        #cycles contains a list of cycles, where each cycle contains the locations of cells in the circular ref
+        for cycle in cycles:
+            for cell in cycle:
+                cell_index, cell_name = self.seperate_spdsheet_name(cell)
+                cell_contents = sheets.Workbook.get_cell_contents(cell_index, cell_name) 
+                cell_contents.contents = "=#CIRCREF!"
+        
+        #Priorty #1: Parse, parse errors might happen
+        index, name = self.seperate_spdsheet_name(source)
+        cell_contents = sheets.Workbook.get_cell_contents(index, name) 
+        tree = self.formula_parser.parse(cell_contents)
+
+        self.update_spreadsheet(self, source)
+
+        return self.evaluate_tree(tree)
 
 
     def evaluate_tree(self, tr):
-        EvaluateFormula(self.workbook).visit(tr)
+        return EvaluateFormula(self.workbook).visit(tr)
+
+    def update_spreadsheet(self, source):
+        #Performs a Topological sort on the workbook and evaluates each source
+
+        update_order = self.iter_topological_sort(source)
+        for cell_location in update_order:
+            cell_index, cell_name = self.seperate_spdsheet_name(cell_location)
+            cell_contents = sheets.Workbook.get_cell_contents(cell_index, cell_name) 
+            tree = self.formula_parser.parse(cell_contents)
+
+            #do not update cell_contents, stays the same
+            #update cell_type
+            #update cell_value
+
+            new_value = self.evaluate_tree(self, tree)
+            curr_cell = sheets.Workbook.get_cell_from_spreadsheet(cell_index, cell_name) 
+            val, cont, typ = CellContents.edit_value_for_type(new_value, curr_cell.type, cell_contents)
+
+            cell_contents.value = val
+            #aslo update type?
+            cell_contents.type = CellContents.find_type(val)
+    
+    def iter_topological_sort(self, source):
+        seen = set()
+        stack = [source]
+
+        while(len(stack) != 0):
+            curr = stack.pop()
+            if curr not in seen:
+                self.topological_sort_helper(seen, stack, source)
+        
+        return stack[::-1]
+    
+
+    def ref_generator(self, cell):
+        index, name = self.seperate_spdsheet_name(cell)
+        curr_cell = sheets.Workbook.get_cell_contents(index, name) #PARSE LOCATION
+        for ref in curr_cell.get_references:
+            yield ref
+
+    def topological_sort_helper(self, seen, stack, source):
+        curr_stack = [(source,self.ref_generator(source))]
+
+        while (len(curr_stack) != 0):
+
+            source, generated = curr_stack[-1]
+            seen.add(source)
+
+            curr_stack.pop()
+
+            indicator = True
+            while indicator:
+                generated_next = next(generated, None)
+                if generated_next is None:
+                    indicator = False
+                    stack.append(source)
+                    continue
+
+                if generated_next not in seen:
+                    curr_stack.append((source, generated))
+                    curr_stack.appen((generated_next, self.ref_generator(generated_next)))
+                    indicator = False
 
 
-
-
+    def seperate_spdsheet_name(self, location):
+        slice_index = location.index('!')
+        return location[0:slice_index], location[(slice_index + 1):]
 
 if __name__ == "__main__":
     workbook_2 = sheets.Workbook()
@@ -246,10 +308,7 @@ if __name__ == "__main__":
 
 
 
-    # DO CIRC ERROR
-    #make sure to parse names corrcetly 
-    
-    #auto updating of cells
+ 
     #do concat with non strings
     #empty cells with arithmetic and empty cells with concatenation
     #if error in cell, make sure cell has right error

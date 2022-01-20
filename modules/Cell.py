@@ -5,14 +5,12 @@ class Cell:
     # A cell containing its contents and its location on the spreadsheet
 
     # location is in format [col][row]; i.e. BR453
-    def __init__(self, location, cell_contents='', wrkbk = ''):
-        # Initialize a new cell in the spreadsheet at a specified location with
-        # the given cell_contents in the workbook
+    def __init__(self, location, cell_contents='', wrkbk = '', spdrsheet = ""):
         row, col = self.convert_location_to_indices(location.upper()) # row, col are 1 indexed
         self.row = row
         self.col = col
         self.workbook = wrkbk
-        self.cell_contents = CellContents.CellContents(cell_contents, wrkbk)
+        self.cell_contents = CellContents.CellContents(cell_contents, wrkbk, location, spdrsheet)
 
 
     def convert_location_to_indices(self, location):

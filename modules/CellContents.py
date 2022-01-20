@@ -1,22 +1,20 @@
 from decimal import *
+from pdb import lasti2lineno
 import FormulaParser
 import CellError
 import CellErrorType
 
 class CellContents:
 
-    # The contents of a cell. The contents have one of the following types:
-    # EMPTY, STRING, FORMULA, ERROR, STRING, LITERAL
-    # Based on the contents' type, its value is found.
-
-    def __init__(self, contents='', wrkbk =''):
-        # Initialize the contents of a cell. 
+    def __init__(self, contents='', wrkbk ='', loc = "", sprdsheet =""):
         self.contents = self.filter_contents(contents)
         self.workbook = wrkbk
         self.type = self.find_type(contents)
         self.value = ''
         self.set_value(self.type, contents, self.workbook)
-        self.references = []
+        self.references = [] #stored as SHEET![COL][ROW]
+        self.location = loc
+        self.spreadsheet = sprdsheet
 
     def get_contents(self):
         # Return the contents of the cell_contents object
@@ -31,6 +29,43 @@ class CellContents:
         self.type = self.find_type(new_content)
         self.set_value(self.type, new_content, new_workbook)
         #incorporate references here 
+
+        #only cell references if a formula
+        if self.type == 'FORMULA':
+            operators = ['+', '-', '=', '/', '*', '&', '(', ')']
+            lst = self.contents.split()
+            operands = []
+
+            #parses cell references out of formula
+            curr_index = 0
+            for index in range(len(lst)):
+                if lst[index] in operators:
+                    #want to find the value to the left and right 
+                    for i in range(curr_index, index):
+                        operand = lst[curr_index:index]
+                        curr_index = index + 1
+                        operands.append(operand)
+            
+            clean_operands = [item for item in operands if item != ""]
+            
+            #adds sheet name to the references that do not have them yet 
+            for i in range(len(clean_operands)):
+                if '!' not in clean_operands[i]:
+                    update = self.spreadsheet + '!' + clean_operands[i]
+                    clean_operands[i] = update 
+            self.references = clean_operands 
+
+                
+        
+
+
+            #can have the sheet name or not 
+            #if no, append current sheet name
+            #add to self.refs
+
+
+
+        #need to parse and add cell refs 
 
 
     def filter_contents(self, contents):
@@ -82,6 +117,39 @@ class CellContents:
         return self.type
 
 
+
+
+    #Assume the cell contents have already been parsed and the cell value is the approriate value
+    def edit_value_for_type(self, cell_value, cell_type, cell_contents):
+        #ADD CURRENT SHEET NAME:
+        #CHECK IF AN ERROR 
+        if cell_value == "#ERROR!": #UPDATE TYPE TOO 
+            cell_contents = CellErrorType.CellErrorType.PARSE_ERROR
+        elif cell_value == "#CIRCREF!":
+            cell_contents = CellErrorType.CellErrorType.CIRCULAR_REFERENCE
+        elif cell_value == "#REF!":
+            cell_contents = CellErrorType.CellErrorType.BAD_REFERENCE
+        elif cell_value == "#NAME?":
+            cell_contents = CellErrorType.CellErrorType.BAD_NAME
+        elif cell_value == "#VALUE!":
+            cell_contents = CellErrorType.CellErrorType.TYPE_ERROR
+        elif cell_value == "#DIV/0!":
+            cell_contents = CellErrorType.CellErrorType.DIVIDE_BY_ZERO
+        elif cell_type == 'LITERAL':
+        # REMOVE ALL TRAILING ZEROS FROM DECIMAL VALUE
+            if '.' in cell_value:
+                for i in range(len(cell_value)-1, -1, -1):
+                    if cell_value[i] == '0':
+                        new_value = cell_value[:i]
+                    else:
+                        if cell_value[i] == '.':
+                            cell_value = cell_value[:i]
+                        break
+            cell_value = Decimal(cell_value)
+        return cell_value, cell_contents, cell_type
+
+
+    # If the cell contents appear to be a formula, and the formula is
     def set_value(self, contents_type, contents, workbook):
         # given a content's type, convert the contents into a value that
         # has Decimal type if content is a number, Formula type if formula, 
@@ -105,35 +173,19 @@ class CellContents:
 
             #ADD CURRENT SHEET NAME:
              
-
+            cell_location = self.location
+            cell_spreadsheet = self.spreadsheet
+            new_location = str(cell_spreadsheet) + '!' + cell_location 
+            #if spreadsheet name is not here, add it 
             curr_tree =  FormulaParser.ParseFormula(contents, workbook)
-            self.value = curr_tree.evaluate_tree()
+            self.value = curr_tree.evaluate_spreadsheet(new_location)
 
-            #CHECK IF AN ERROR 
-            if self.value == "#ERROR!":
-                self.contents = CellErrorType.CellErrorType.PARSE_ERROR
-            elif self.value == "#CIRCREF!":
-                self.contentS = CellErrorType.CellErrorType.CIRCULAR_REFERENCE
-            elif self.value == "#REF!":
-                self.contents = CellErrorType.CellErrorType.BAD_REFERENCE
-            elif self.value == "#NAME?":
-                self.contents = CellErrorType.CellErrorType.BAD_NAME
-            elif self.value == "#VALUE!":
-                self.contents = CellErrorType.CellErrorType.TYPE_ERROR
-            elif self.value == "#DIV/0!":
-                self.contents = CellErrorType.CellErrorType.DIVIDE_BY_ZERO
-            
-        if contents_type == 'LITERAL':
-            # REMOVE ALL TRAILING ZEROS FROM CONTENTS
-            if '.' in contents:
-                for i in range(len(contents)-1, -1, -1):
-                    if contents[i] == '0':
-                        contents = contents[:i]
-                    else:
-                        if contents[i] == '.':
-                            contents = contents[:i]
-                        break
-            self.value = Decimal(contents)
+            new_value, new_contents, new_type = self.edit_value_for_type(self.value, contents_type, contents)
+            self.value = new_value
+            self.contents = new_contents
+            self.type = new_type
+
+
 
 
     #Def check_for_sheet_names(self, contents, )
