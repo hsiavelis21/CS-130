@@ -186,23 +186,23 @@ class ParseFormula():
             if curr_cell_location not in seen:
                 seen.add(curr_cell_location)
                 curr_cell = sheets.get_cell(curr_cell_location) #change to pass in cell location and sheet name
-                curr_cell_contents =  sheets.get_cell_contents(curr_cell_location) #change to pass in cell location and sheet name
                 curr_refs = curr_cell.get_references()
+                curr_cycle.append(b)
 
                 for b,a in adj_lst:
                     if b == curr_cell_location:
-                        #keeps track of all cells that reference the current cell, need to remove their refs
+                        #keeps track of all cells that reference the current cell
+                        curr_cycle.append(a)
                         adj_cell_contents = sheets.get_cell_contents(a) #change to pass in cell location and sheet name
                         adj_cell_contents.remove_reference(b) #lets the programmer know that the referenced cell has been parsed
 
 
-                if len(curr_refs) == 0: #REACHED A LEAF
-                    try: 
-                        new_tree = self.formula_parser.parse(curr_cell_contents)
-                    except (UnexpectedEOF,UnexpectedCharacters):
-                        formula = "=#ERROR!"
-                        new_tree = self.formula_parser.parse(formula)
-                    result = self.evaluate_tree(new_tree)
+               if curr_cell not in seen:
+                result.append(curr_cell_location)
+                seen.add(curr_cell)
+                for a, b in curr_refs:
+                    stack.append(b)
+                    
 
             #go through adj_lst and find all tuples whose first value is cell_location
             #once got this tuple, evaluate contents PARSEEEE   

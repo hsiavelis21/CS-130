@@ -1,0 +1,234 @@
+CS130 Project 1 - Design Document
+=================================
+
+Please answer all questions in this design document.  Note that the final
+feedback section is optional, and you are not required to answer it if you
+don't want to.
+
+Unanswered or incompletely answered questions, or answers that don't actually
+match the code/repository, will result in deductions.
+
+Answers don't have to be deeply detailed!  We are mainly looking for an
+overview or summary description of how your project works, and your team's
+experiences working on this project.
+
+Logistics (7 pts)
+------------------
+
+L1.  [2pts] Enumerate all teammates here.
+          - Helen Siavelis, Sahana Saikumar
+
+
+L2.  [2pts] What did each teammate focus on during this project?
+          - Helen focused on Lark, formula parsing, and cell references, while
+               Sahana focused on building and testing the abstractions.
+
+
+L3.  [3pts] Approximately how many hours did each teammate spend on the project?
+          - Each teammate spent about 20 hours on the project.
+
+
+Spreadsheet Engine Design (20 pts)
+----------------------------------
+
+D1.  [3pts] Describe the high-level design abstractions (e.g. classes and/or
+     submodules) in your spreadsheet engine, and what purposes these various
+     abstractions fulfill.
+          - The high-level design abstractions in the spreadsheet engine are
+          the following:
+               1) Workbook class: the workbook class is the highest level of
+               abstraction and is the API that is used by the user. In addition,
+               this class handles the creation of workbooks and functionality
+               such as generating valid spreadsheets and deleting spreadsheets
+               from the workbook. The workbook is initialized to hold a list of
+               spreadsheets.
+
+               2) Spreadsheet class: This class is the next level of abstraction
+               and handles functionality such as creating, updating, and removing
+               cells. The design of this spreadsheet is such that a spreadsheet
+               has a name and a dictionary. The dictionary has keys that are string
+               location values to a cell in the spreadsheet and the corresponding
+               values are the cell at the location of the key.
+
+               3) Cell class: This class is the next level of abstraction and handles
+               returning the row and column value of the current cell as well as returning
+               the contents of the cell. The design of a cell is such that a cell has 
+               a row and col property (row and column indices of the cell in the spreadsheet),
+               a wkrbk property (defines what workbook the cell belongs to) and a
+               cell_contents property that holds the contents of the cell.
+
+               4) CellContents class: This class is the loewst level of abstraction
+               and holds the contents of a cell. This class has a contents property
+               that holds the contents of a cell, a workbook property that holds the
+               workbook these contents belong to, a type property that defines what
+               data type the contents are, a value type that converts the contents of
+               the cell into its value based on the content's type, and a references list
+               that holds the list of references that these contents reference. The purpose
+               of this abstraction is to filter the contents to ensure no leading or trailing
+               white-spaces, find the type of the information entered in a cell, and
+               reflect the value of the cell given its type
+
+               5) We also have the Formula Parser which given some cell contents, parses
+               the contents and performs operations based on the type of the contents.
+
+
+D2.  [4pts] Why did you choose the design you chose?  Describe other designs
+     (or perhaps earlier versions of the above design) that you considered,
+     and why you ended up not using them.
+          - We chose the design that we chose because we realized early on that 
+          it didn't make much sense for the workbook to hold the implementation 
+          details of the spreadsheet. Then, while making the spreadsheet class, 
+          we realized that each spreadsheet holds a bunch of cells. We made a cell
+          class to simplify the spreadsheet class implementation. Finally, each cell
+          holds different contents. To simplify the implementation of the cell class,
+          we made a cell contents class. An earlier version of the design was to not
+          have a cell contents class at all and just put the contents in the cell 
+          class. However, we ran into issues with conceptualizing how to determine the 
+          cell's types and values given its contents, and we realized that it was
+           easier to just create a class that handled these tasks.
+
+          In addition, another design that we considered was using a 2D matrix as
+          the underlying data structure for the spreadsheet. However, we realized
+          that given the potential size of the spreadsheet, using a 2D matrix was
+          extremely inefficient with regards to both time and memory. As a result, 
+          we chose to use a dictionary to be the underlying data structure
+          where if a cell is empty in the spreadsheet, it simply does not exist in 
+          the dictionary.
+
+
+D3.  [4pts] At a high level (e.g. pseudocode or higher), enumerate the steps
+     that your spreadsheet engine goes through when a caller sets a cell's
+     contents.
+
+          1) The set_cell_contents method in sheets.py is called. In this method, 
+          the list of sheets in the workbook is iterated through to find the name
+          of the sheet that the cell is in. If that sheet doesn't exist, a KeyError
+          is raised. Otherwise, set_spreadsheet_cell_contents() is called on
+          the current sheet
+
+          2) In Spreadsheet.py, set_spreadsheet_cell_contents is called. This function
+          edits an existing cell if the cell location already has contents in the
+          spreadsheet or adds a new cell if the current cell location is empty in
+          the spreadsheet. The spreadsheet dictionary is updated accordingly based
+          on whether a cell is updated, added, or deleted by calling the cell's
+          set_cell_contents() method
+          
+          3) In Cell.py, the contents of the cell are set using the cell_contents class'
+          set_contents() method 
+
+          4) in CellContents.py, the set_contents() method is called. In this method, the
+          filter_contents() method is called taking in the new cell contents as a parameter
+          and filters out any invalid whitespaces in the contents and the find_type() method
+          is called to find the value of the contents. Then, using this type, the value
+          of the contents is found and the cell's value is set to this value.
+
+D4.  [3pts] How does your spreadsheet engine identify what other cells need
+     updating when a cell's contents are changed, and what order to update them?
+
+
+D5.  [3pts] How does your spreadsheet engine identify cycles between cells when
+     a cell update is performed?  Are cells in a cycle processed any differently
+     from other cells outside of the cycle?
+
+
+D6.  [3pts] What steps does your spreadsheet engine go through when a sheet is
+     deleted from a workbook?  How does it identify cells that may be affected
+     by the sheet-deletion?
+
+          When a sheet is deleted from a workbook, the del_sheet() function
+          in sheets.py is called. In this function, the list of sheets is iterated
+          through and if the name of this sheet exists in the list, the sheet
+          is deleted from the list in the workbook. HOW DOES IT IDENTIFY CELLS
+          THAT MAY BE AFFECTED BY SHEET-DELETION??
+
+Implementation Process (23 pts)
+-------------------------------
+
+P1.  [4pts] How did your team break down and keep track of the various tasks to
+     complete for this project?  Did you use the GitHub issue tracker, or some
+     other system like Trello, or some other tool?
+          - We used a shared document on Google Drive to break down and keep track
+          of the various tasks to complete for this project. We broke down the
+          tasks of this project using the headings given in the specification.
+          We broke down the project even more within the headings of each 
+          specification.
+
+
+P2.  [4pts] How did you assign tasks to teammates?  Did you stick with your
+     task-assignments through the project, or did you shift around tasks as the
+     project progressed?  Why?
+          - Initially, we planned on pair programming the entire project. However,
+          we realized that we would not be able to finish the project given the
+          deadline if we did not split our work up. As a result, Sahana turned
+          her focus to fine-tuning the abstractions and making sure they were
+          correct, while Helen focused on Lark. After this split, we did not
+          shift around the tasks too much as the project progressed because
+          we were both better at writing code for our respective duties.
+
+
+P3.  [4pts] How would you characterize the quality of your project testing?
+     Make sure to touch on these items:  Is it automated?  Is it easy for
+     teammates to run?  Is it fast?  Is it reasonably complete?
+          - We would characterize the quality of our project testing to be
+          reasonably thorough. Our testing is automated, it is easy for teammates
+          to run as it is simply one command in the terminal, and it is fast.
+          The tests are reasonably complete and check most methods in the
+          abstractions as well as edge cases.
+
+
+P4.  [3pts] What mechanisms did your team use for communication during the
+     project?  Did you find them to be effective?  What issues did you
+     encounter, if any?
+          - We used texting and meeting up together for communication during the
+          project. Meeting up was a far more effective communication mechanisms
+          as if one person was stuck on a bug, it was easy for the other to help
+          find the issue. Some issues we encountered were that when texting were
+          that it was difficult to help debug and hlp explain pieces of code that
+          the other person had worked on.
+
+
+P5.  [3pts] Did you use any kind of collaborative construction techniques, e.g.
+     code reviews or pair-programming, during the project?  If so, what are your
+     observations about its usefulness?  Did you find it to have any downsides?
+          - Yes, we used a lot of pair-programming during the project when initially
+          building the abstractions so that both parties would be familiar with the
+          design of the project. It was useful because it was easier to catch bugs
+          while the code was being written instead of having to wait until tests are
+          run to find the bugs. As a result, there were less bugs during the testing
+          process since a majority of the bugs were caught and fixed while writing
+          the code. The downsides to this method is that it was not as time efficient
+          as dividing and conquering the project.
+
+P6.  [5pts] What would you like to improve about your team's development
+     process, going forward?
+          - We would like to hash out the design process in more detail going
+          forward as it was inefficient to write code based on a pre-planned
+          design that turned out to take up too much memory when actually run.
+          By planning out the design process in more detail from the get-go,
+          this issue could have been completely avoided and there would have
+          been no need to refactor the code to address the new choice of design.
+
+
+Section F:  CS130 Project 1 Feedback [OPTIONAL]
+-----------------------------------------------
+
+These questions are OPTIONAL, and you do not need to answer them.  Your grade
+will not be affected by answering or not answering them.  Also, your grade will
+not be affected by negative feedback - we want to know what went poorly so that
+we can improve future versions of the course.
+
+F1.  What parts of the assignment did you find highly enjoyable?  Conversely,
+     what parts of the assignment did you find unenjoyable?
+
+
+F2.  What parts of the assignment helped you learn more about software
+     engineering best-practices, or other useful development skills?
+     What parts were not helpful in learning these skills?
+
+
+F3.  Were there any parts of the assignment that seemed _unnecessarily_ tedious?
+     (Some parts of software development are always tedious, of course.)
+
+
+F4.  Do you have any feedback and/or constructive criticism about how this
+     project can be made better in future iterations of CS130?

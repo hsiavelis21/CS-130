@@ -8,7 +8,7 @@ class Spreadsheet:
 
     # Empty sheet constructor
     # Properties of a spreadsheet: matrix of cells
-    def __init__(self, name = "", wrkbk = ''):
+    def __init__(self, name='', wrkbk=''):
         self.name = name
         self.workbook = wrkbk
 
