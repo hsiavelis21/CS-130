@@ -2,7 +2,7 @@ import context
 import sheets
 import pytest
 
-cell1 = Cell.Cell(('A1'))
+cell1 = Cell(('A1'))
 cell2 = Cell(('A15')) 
 cell3 = Cell(('B12')) 
 cell4 = Cell('AZ1') 
