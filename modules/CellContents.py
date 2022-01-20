@@ -102,6 +102,10 @@ class CellContents:
                 self.value = contents
 
         if contents_type == 'FORMULA':
+
+            #ADD CURRENT SHEET NAME:
+             
+
             curr_tree =  FormulaParser.ParseFormula(contents, workbook)
             self.value = curr_tree.evaluate_tree()
 
@@ -132,6 +136,8 @@ class CellContents:
             self.value = Decimal(contents)
 
 
+    #Def check_for_sheet_names(self, contents, )
+    
     def get_value(self): #parse for cell references
         # Return the value of the cell_contents object
         return self.value
@@ -140,6 +146,9 @@ class CellContents:
         # Return whether or not the cell_contents object is empty
         return self.contents == None
 
+     #adds cells that the current cell references
+     #REFERENCES ARE TUPLES JUST LIKE EDGES
+     #(a, b) a references b 
     def add_reference(self, ref):
         # Adds cells that the current cell references
 
