@@ -46,8 +46,11 @@ class Workbook:
         # workbook's internal state.
         return self.spreadsheet_list
 
-    #generates a spreadsheet name that is valid
     def generate_spreadsheet_name(self):
+        # Return a string that is a valid spreadsheet name. The string should not
+        # contain any leading or trailing whitespaces and must not be the name of
+        # an already existing spreadsheet.
+
         curr_number = self.num_sheets() + 1
         new_name = "Sheet" + str(curr_number)
 

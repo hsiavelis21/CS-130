@@ -1,14 +1,16 @@
 import Cell
+
 class Spreadsheet:
+
+    # A spreadsheet containing zero or more defined cells.
 
     MAX_CELL = 'ZZZZ9999'
     MAX_ROW = 10 #9999
     MAX_COL = 10 #475254
 
-
-    # Empty sheet constructor
-    # Properties of a spreadsheet: matrix of cells
     def __init__(self, name='', wrkbk=''):
+        # Initialize a new empty spreadsheet with its name and workbook
+        # it belongs to
         self.name = name
         self.workbook = wrkbk
 
@@ -16,24 +18,27 @@ class Spreadsheet:
         self.extent = (0, 0)
 
         self.dict = {}
-
+    
     def get_name(self):
+        # Return the name of the spreadsheet
         return self.name
 
     def set_name(self, new_label):
+        # Set the name of the spreadsheet to new_label
         self.name = new_label
 
     def get_extent(self):
+        # Return a tuple denoting the extent of the spreadsheet as ([col], [row])
         return self.extent
 
     def set_extent(self, new_extent):
+        # Set the extent of the spreadsheet to new_extent
         self.extent = new_extent
 
-    # Given a row and column index (input is 1-indexed), return the corresponding spreadsheet string location
-    # Location must be 1 indexed.
     def convert_indices_to_location(self, r, c):
-        # Convert 0-indexed indices to 1-index
-
+        # Given a row and column index (input is 1-indexed), return the 
+        # corresponding spreadsheet string location. Location must be 1 indexed.
+        
         col = ""
         A = ord('A')
         while True:
@@ -48,13 +53,14 @@ class Spreadsheet:
         return col + str(r)
                 
 
-    # given location in string format [col][row], return separate column and row strings ex) A15, B12
-    # WILL GIVE 1-INDEXED VALUES
     def convert_location_to_indices(self, location):
+        # given location in string format [col][row], return separate column and 
+        # row strings ex) A15, B12
+
         row = ''
         col = ''
         for i in range(len(location)):
-            if location[i].isnumeric(): # if character is a letter, it belongs to 
+            if location[i].isnumeric():
                 row += location[i]
             else:
                 col += location[i]
@@ -65,15 +71,18 @@ class Spreadsheet:
         return(row, col)
 
     def cast_column_to_number(self, col):
-    #col is a string of letters
+    # Given a string denoting a column, return a numeric value for the column
         num = 0
         size = len(col) - 1
         for index in range(len(col)):
             num += (26 ** (index)) * (ord(col[size - index]) - 64)
         return num
 
-    #edits an EXISTING STATEMENTS or adds a NEW cell
+   
     def set_spreadsheet_cell_contents(self, location, new_contents, new_workbook):
+        # Updates the contents of an already existing cell in the spreadsheet or adds
+        # contents to a new cell in the spreadsheet
+
         new_contents = new_contents.strip()
         # Convert location to indices on spreadsheet
         row, col = self.convert_location_to_indices(location)
@@ -109,11 +118,10 @@ class Spreadsheet:
                 self.extent = (max(self.extent[0], new_col), max(self.extent[1], new_row))
 
 
-    
-    # If the cell at [row, col] does not exist, return the new extent of the spreadsheet. If row, col
-    # is less than the current extent, return the current extent
     def get_new_extent(self, location):
-
+        # If the cell at the given location does not exist, return the new extent of the 
+        # spreadsheet. If row, col is less than the current extent, return the current extent
+        
         row, col = self.convert_location_to_indices(location)
 
         if row < self.extent[1] and col < self.extent[0]:
@@ -131,8 +139,9 @@ class Spreadsheet:
         return max_row, max_col
 
 
-    #gets an existing cell
     def get_spreadsheet_cell_contents(self, location):
+        # Return the cell contents of an existing cell
+
         row, col = self.convert_location_to_indices(location)
         # Check if location is a valid location on the spreadsheet
         if row < 1 or row > 9999 or col < 1 or col > 475254:
@@ -145,6 +154,8 @@ class Spreadsheet:
         return self.dict[location].get_cell_contents()
 
     def get_spreadsheet_cell_value(self, location):
+        # Return the cell value of an existing cell
+
         row, col = self.convert_location_to_indices(location)
 
         if row < 1 or row > 9999 or col < 1 or col > 475254:
