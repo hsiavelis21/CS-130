@@ -44,7 +44,10 @@ class Workbook:
         #
         # A user should be able to mutate the return-value without affecting the
         # workbook's internal state.
-        return self.spreadsheet_list
+        lst = []
+        for sheet in self.spreadsheet_list:
+            lst.append(sheet.name)
+        return lst
 
     #generates a spreadsheet name that is valid
     def generate_spreadsheet_name(self):
@@ -164,7 +167,7 @@ class Workbook:
             curr_sheet = self.spreadsheet_list[i]
             if curr_sheet.name.lower() == sheet_name.lower():
                 #get the cell and change contents
-                curr_sheet.set_spreadsheet_cell_contents(location, contents, self.list_sheets())
+                curr_sheet.set_spreadsheet_cell_contents(location, contents, self)
                 return
         
         raise KeyError("Specified sheet name is not found.")
@@ -222,5 +225,16 @@ class Workbook:
                 return curr_sheet.get_spreadsheet_cell_value(location)
         
         raise KeyError("Specified sheet name is not found.")
+
+
+    def get_cell_from_spreadsheet(self, sheet_name, location):
+        #parse for sheet name and [col][rol]
+        for i in range(self.num_sheets()):
+            curr_sheet = self.spreadsheet_list[i]
+            if curr_sheet.name.lower() == sheet_name.lower():
+                #get the cell and change contents
+                return curr_sheet.get_cell(location)
+
+
 
 

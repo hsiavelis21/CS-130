@@ -29,6 +29,9 @@ class Spreadsheet:
     def set_extent(self, new_extent):
         self.extent = new_extent
 
+    def get_cell(self, location):
+        return self.dict[location]
+
     # Given a row and column index (input is 1-indexed), return the corresponding spreadsheet string location
     # Location must be 1 indexed.
     def convert_indices_to_location(self, r, c):
