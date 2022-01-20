@@ -2,6 +2,8 @@ import CellContents
 
 class Cell:
     
+    # A cell containing its contents and its location on the spreadsheet
+
     # location is in format [col][row]; i.e. BR453
     def __init__(self, location, cell_contents='', wrkbk = '', spdrsheet = ""):
         row, col = self.convert_location_to_indices(location.upper()) # row, col are 1 indexed
@@ -11,9 +13,9 @@ class Cell:
         self.cell_contents = CellContents.CellContents(cell_contents, wrkbk, location, spdrsheet)
 
 
-    # given location in string format [col][row], return separate column and row strings ex) A15, B12
-    # OUR MATRIX IS 0-INDEXED WHILE THE SPREADSHEET ITSELF IS ONE INDEXED; FIND LOCATION WILL GIVE 1-INDEXED VALUES
     def convert_location_to_indices(self, location):
+        # given location in string format [col][row], return separate column and row strings ex) A15, B12
+
         row = ''
         col = ''
         for i in range(len(location)):
@@ -29,64 +31,74 @@ class Cell:
 
 
     def cast_column_to_number(self, col):
-    #col is a string of letters
+        # Given a string denoting a column, return a numeric value for the column
+    
         num = 0
         size = len(col) - 1
         for index in range(len(col)):
             num += (26 ** (index)) * (ord(col[size - index]) - 64)
         return num
         
-    # DIFFERENT FROM FIND_INDICES; given cell object, return cell's row and col index
     def get_row(self):
+        # Return the cell's numerical row index
         return self.row
 
     def get_col(self):
+        # Return the cell's numerical col index
         return self.col
 
-    # Return contents object of cell
     def get_cell_contents(self):
+        # Return contents object of the cell
         return self.cell_contents.get_contents()
 
     def set_cell_contents(self, new_contents, new_workbook):
+        # Set the contents of the cell to new_contents
         self.cell_contents.set_contents(new_contents, new_workbook)
 
-    # Return cell's value 
     def get_cell_value(self):
+        # Return cell's value 
         return self.cell_contents.get_value()
 
     def set_cell_value(self, new_contents, new_workbook):
+        # Set the cell's value to the value of new_contents
         self.cell_contents.set_value(self.find_cell_type(new_contents), new_contents, new_workbook)
 
     def get_cell_type(self):
+        # Get the type of the cell
         return self.cell_contents.get_type()
 
     def set_cell_type(self, new_type):
+        # Set the type of the cell to new_type
         self.set_type(new_type)
 
     def find_cell_type(self, contents):
+        # Find the type of the contents of the cell
         return self.cell_contents.find_type(contents)
 
     def set_cell_index(self, r, c):
+        # Set the indices of the cell to r, c
         self.row = r
         self.col = c
 
-
     def get_cell_index(self):
+        # Return the indices of the cell
         return (self.row, self.col)
 
     def is_empty(self):
+        # Return True if the cell has no contents in it, False otherwise
         return self.cell_contents.is_empty()
 
-    #gets cells that the current cell references
     def add_content_reference(self):
+        # Add a cell reference to the cells that the current cell references
         return self.add_reference()
 
-    #gets cells that the current cell references
     def get_content_references(self):
+        # Return the list of cells that the current cell references
         return self.get_references()
     
-    #removes a reference that the cell no longer references
     def remove_content_reference(self, ref):
+        # Removes a reference that the cell no longer references
+
         references = self.get_references()
         for i in range(len(references)):
             if references[i].get_index() == ref.get_index():
