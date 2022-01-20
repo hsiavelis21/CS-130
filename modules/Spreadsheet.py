@@ -85,7 +85,7 @@ class Spreadsheet:
         if row < 1 or row > 9999 or col < 1 or col > 475254:
             raise ValueError('Cell location is invalid.')
 
-        new_cell = Cell.Cell(location, new_contents, new_workbook)
+        new_cell = Cell.Cell(location, new_contents, new_workbook, self.name)
 
         # Case 1: Cell at specified location has non-empty contents 
         if location in self.dict.keys():

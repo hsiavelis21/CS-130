@@ -3,12 +3,12 @@ import CellContents
 class Cell:
     
     # location is in format [col][row]; i.e. BR453
-    def __init__(self, location, cell_contents='', wrkbk = ''):
+    def __init__(self, location, cell_contents='', wrkbk = '', spdrsheet = ""):
         row, col = self.convert_location_to_indices(location.upper()) # row, col are 1 indexed
         self.row = row
         self.col = col
         self.workbook = wrkbk
-        self.cell_contents = CellContents.CellContents(cell_contents, wrkbk)
+        self.cell_contents = CellContents.CellContents(cell_contents, wrkbk, location, spdrsheet)
 
 
     # given location in string format [col][row], return separate column and row strings ex) A15, B12
